@@ -1,0 +1,2149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f2f2f7">
+<title>JessOS 26.11 · Weekend Recovery Update</title>
+<meta name="description" content="JessOS 26.11 is ready to install. Weekend Recovery Update · 14 km. Sound on.">
+<meta property="og:title" content="JessOS 26.11 is ready to install 📲">
+<meta property="og:description" content="Weekend Recovery Update · 14 km. Sound on.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://vaibhavbrkn.github.io/jess-os/media/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📲</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sys:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --round:ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --hand:"Caveat", "Bradley Hand", "Segoe Print", cursive;
+    --top:env(safe-area-inset-top, 0px); --bot:env(safe-area-inset-bottom, 0px);
+    --blue:#0a84ff; --sep:rgba(60,60,67,.13);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; background:#140f1a; overflow:hidden; overscroll-behavior:none; }
+  body{ font-family:var(--sys); -webkit-font-smoothing:antialiased; color:#fff; touch-action:manipulation; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+  button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; text-align:inherit; }
+  img{ display:block; max-width:100%; -webkit-user-drag:none; }
+  .hide{ display:none !important; }
+
+  #phone{ position:relative; width:100%; height:100vh; height:100dvh; margin:0 auto; overflow:hidden; background:#000; isolation:isolate; container-type:size; }
+  @media (min-width:600px){
+    body{ display:grid; place-items:center; background:radial-gradient(70% 60% at 50% 40%, #3b2342, #140f1a); }
+    #phone{ width:390px; height:min(844px, calc(100dvh - 48px)); border-radius:52px;
+      box-shadow:0 0 0 11px #0d0b10, 0 0 0 12.5px #3d3742, 0 50px 100px rgba(0,0,0,.55); }
+  }
+
+  /* ---------- wallpaper ---------- */
+  #wall{ position:absolute; inset:-12%; z-index:0; transition:filter 1.4s;
+    background:
+      radial-gradient(38% 30% at 22% 20%, rgba(255,138,122,.95), transparent 70%),
+      radial-gradient(42% 34% at 84% 26%, rgba(180,155,255,.92), transparent 70%),
+      radial-gradient(46% 38% at 26% 76%, rgba(255,150,192,.85), transparent 70%),
+      radial-gradient(55% 45% at 86% 88%, rgba(108,92,231,.9), transparent 72%),
+      linear-gradient(165deg, #3d1d4c, #1c1030);
+    animation:drift 26s ease-in-out infinite alternate; }
+  @keyframes drift{ to{ transform:translate3d(-4%,3%,0) scale(1.1) rotate(4deg); } }
+  #phone.focus #wall{ filter:brightness(.45) saturate(.7) hue-rotate(-15deg); }
+
+  /* ---------- status bar ---------- */
+  #sb{ position:absolute; z-index:88; top:0; left:0; right:0; height:calc(32px + var(--top)); padding:var(--top) 22px 0 28px;
+    display:flex; align-items:center; justify-content:space-between; font:600 15px/1 var(--sys); letter-spacing:-.01em; color:#fff;
+    pointer-events:none; opacity:0; transition:opacity .4s, color .35s; }
+  #sb.on{ opacity:1; }
+  #sb.dark{ color:#111; }
+  #sb .r{ display:flex; align-items:center; gap:7px; }
+  #sbMoon{ display:none; font-size:12px; }
+  #phone.focus #sbMoon{ display:inline; }
+  .sig{ display:inline-flex; align-items:flex-end; gap:1.5px; height:11px; }
+  .sig i{ width:3px; background:currentColor; border-radius:1px; }
+  .sig i:nth-child(1){ height:4px; } .sig i:nth-child(2){ height:6px; } .sig i:nth-child(3){ height:8.5px; } .sig i:nth-child(4){ height:11px; }
+  .batt{ display:inline-flex; align-items:center; gap:4px; font:600 12px/1 var(--sys); }
+  .batt .cell{ position:relative; width:25px; height:12.5px; border:1.4px solid currentColor; border-radius:4px; margin-left:2px; }
+  .batt .cell::before{ content:""; position:absolute; right:-4.4px; top:3.1px; width:2.2px; height:4px; border-radius:0 2px 2px 0; background:currentColor; opacity:.6; }
+  .batt .cell i{ position:absolute; left:1.5px; top:1.5px; bottom:1.5px; width:calc((100% - 3px) * var(--lvl, .03)); min-width:2px; background:var(--bc, #ff453a); border-radius:1.5px; transition:background .6s; }
+  #sb.dark #battTxt.low{ color:#ff3b30; }
+
+  /* ---------- screens ---------- */
+  .screen{ position:absolute; inset:0; z-index:5; opacity:0; visibility:hidden; transition:opacity .6s ease, visibility 0s linear .6s; }
+  .screen.on{ opacity:1; visibility:visible; transition:opacity .6s ease; }
+
+  /* update */
+  #s-update{ z-index:9; background:#f2f2f7; color:#111; display:flex; flex-direction:column; }
+  .up-nav{ flex:none; padding:calc(40px + var(--top)) 16px 8px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; font:600 17px var(--sys); }
+  .up-nav .bk{ color:var(--blue); font-weight:400; }
+  .up-scroll{ flex:1; overflow-y:auto; padding:6px 16px 10px; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+  .up-card{ background:#fff; border-radius:16px; padding:18px 16px 6px; animation:rise .7s cubic-bezier(.2,.8,.3,1) both; }
+  @keyframes rise{ from{ opacity:0; transform:translateY(16px); } }
+  .up-head{ display:flex; gap:14px; align-items:center; }
+  .logo{ width:64px; height:64px; flex:none; border-radius:15px; filter:drop-shadow(0 4px 10px rgba(255,122,107,.35)); }
+  .up-head h1{ font:700 19px/1.2 var(--sys); }
+  .up-head p{ font:400 14px/1.35 var(--sys); color:#3c3c43; }
+  .up-head .dim{ color:#8e8e93; font-size:13px; }
+  .up-intro{ margin:16px 0 2px; font:400 15px/1.45 var(--sys); color:#1c1c1e; }
+  .up-card h2{ font:600 15px var(--sys); margin:14px 0 4px; }
+  .up-list{ list-style:none; }
+  .up-list li{ display:flex; gap:12px; padding:10px 0; border-top:1px solid var(--sep); font:400 14.5px/1.42 var(--sys); color:#1c1c1e; }
+  .up-list li i{ font-style:normal; font-size:20px; line-height:1.1; width:26px; text-align:center; flex:none; }
+  .up-list b{ font-weight:600; }
+  .up-act{ flex:none; padding:10px 20px calc(14px + var(--bot)); display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .btn-primary{ width:100%; max-width:360px; padding:16px; border-radius:14px; background:var(--blue); color:#fff; font:600 17px var(--sys); text-align:center;
+    box-shadow:0 8px 24px rgba(10,132,255,.35); animation:breathe 2.2s ease-in-out infinite; }
+  @keyframes breathe{ 50%{ transform:scale(1.03); } }
+  .btn-text{ padding:12px; color:var(--blue); font:400 16px var(--sys); }
+  .up-sound{ font:500 12.5px var(--sys); color:#8e8e93; }
+
+  /* install */
+  #s-install{ z-index:9; background:#000; display:grid; place-items:center; }
+  .ins{ display:flex; flex-direction:column; align-items:center; width:min(78%, 300px); text-align:center; }
+  .ins .logo{ width:96px; height:96px; border-radius:22px; margin-bottom:36px; }
+  .bar{ width:100%; height:6px; border-radius:6px; background:rgba(255,255,255,.18); overflow:hidden; }
+  .bar i{ display:block; height:100%; width:0; background:#fff; border-radius:6px; transition:width 1s ease; }
+  #insMsg{ margin-top:20px; font:500 15px/1.4 var(--sys); min-height:42px; color:#f2f2f7; transition:opacity .25s; text-wrap:balance; }
+  #insEta{ margin-top:2px; font:400 12.5px var(--sys); color:#8e8e93; min-height:16px; }
+  #s-install.boot .bar, #s-install.boot p{ opacity:0; transition:opacity .5s; }
+  #s-install.boot .logo{ animation:bootp 1.5s ease-in-out infinite; }
+  @keyframes bootp{ 50%{ transform:scale(1.07); filter:drop-shadow(0 0 26px rgba(255,143,177,.8)); } }
+
+  /* lock */
+  #s-lock{ z-index:7; display:flex; flex-direction:column; align-items:center; padding:calc(46px + var(--top)) 14px calc(10px + var(--bot)); }
+  #s-lock.up{ transform:translateY(-100%); opacity:0; transition:transform .6s cubic-bezier(.4,0,.2,1), opacity .6s; }
+  .lk-lock{ font-size:17px; }
+  .lk-date{ margin-top:6px; font:600 18px var(--sys); opacity:.92; text-shadow:0 2px 12px rgba(40,10,60,.3); }
+  .lk-time{ font:700 86px/1 var(--round); letter-spacing:-.02em; margin-top:2px; text-shadow:0 4px 30px rgba(60,20,80,.3); }
+  .lk-wid{ display:flex; gap:8px; margin-top:12px; }
+  .wpill{ padding:7px 11px; border-radius:99px; background:rgba(255,255,255,.18); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); font:600 12.5px var(--sys); }
+  .lk-notifs{ width:100%; max-width:400px; margin-top:auto; display:flex; flex-direction:column; gap:7px; padding-bottom:9px; }
+  .nt{ display:flex; gap:11px; align-items:center; padding:10px 13px; border-radius:20px; color:#fff;
+    background:rgba(255,255,255,.2); -webkit-backdrop-filter:blur(22px) saturate(1.4); backdrop-filter:blur(22px) saturate(1.4);
+    animation:ntin .55s cubic-bezier(.2,.9,.3,1.2) both; }
+  @keyframes ntin{ from{ opacity:0; transform:translateY(-14px) scale(.94); } }
+  .nt .ai{ width:34px; height:34px; border-radius:9px; display:grid; place-items:center; font-size:19px; flex:none; background:var(--c); }
+  .nt .tx{ flex:1; min-width:0; }
+  .nt .h{ display:flex; justify-content:space-between; font:600 11.5px/1.2 var(--sys); opacity:.8; text-transform:uppercase; letter-spacing:.02em; }
+  .nt .h span{ text-transform:none; font-weight:400; }
+  .nt b{ display:block; font:600 14.5px/1.25 var(--sys); margin-top:1px; }
+  .nt p{ font:400 14px/1.3 var(--sys); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .np{ width:100%; max-width:400px; display:flex; align-items:center; gap:12px; padding:9px 10px 9px 12px; border-radius:20px;
+    background:rgba(25,10,35,.3); -webkit-backdrop-filter:blur(22px); backdrop-filter:blur(22px); }
+  .art{ width:40px; height:40px; border-radius:9px; flex:none; background:linear-gradient(135deg,#ff8a7a,#b49bff); display:grid; place-items:center; font-size:18px; }
+  .np .tx{ flex:1; min-width:0; }
+  .np b{ display:block; font:600 14px/1.25 var(--sys); }
+  .np .tx span{ font:400 12.5px var(--sys); opacity:.75; }
+  .np button{ width:42px; height:42px; border-radius:50%; font-size:17px; display:grid; place-items:center; background:rgba(255,255,255,.14); }
+  .lk-hint{ margin-top:12px; font:600 14.5px var(--sys); opacity:.92; animation:hint 1.8s ease-in-out infinite; text-shadow:0 2px 10px rgba(40,10,60,.35); }
+  @keyframes hint{ 50%{ transform:translateY(-5px); } }
+  .homebar{ display:block; width:134px; height:5px; border-radius:3px; background:#fff; margin:10px auto 0; opacity:.9; }
+
+  /* home */
+  #s-home{ z-index:6; display:flex; flex-direction:column; padding:calc(42px + var(--top)) 16px calc(10px + var(--bot)); }
+  #s-home.enter .wx, #s-home.enter .ic, #s-home.enter .dock{ animation:icin .7s cubic-bezier(.2,.9,.3,1.1) both; animation-delay:calc(var(--i, 0) * 22ms); }
+  @keyframes icin{ from{ opacity:0; transform:scale(1.3); } }
+  .wx{ position:relative; display:grid; grid-template-columns:1fr auto; gap:2px 12px; border-radius:22px; padding:14px 16px 12px;
+    background:linear-gradient(155deg, #5f9dff, #8f78ff 62%, #ff8fb1); box-shadow:0 10px 30px rgba(30,10,60,.25); }
+  .wx-l b{ display:block; font:600 14px var(--sys); }
+  .wx-big{ display:block; font:300 46px/1.05 var(--sys); letter-spacing:-.02em; }
+  .wx-r{ display:flex; flex-direction:column; align-items:flex-end; text-align:right; font:500 13px/1.3 var(--sys); }
+  .wx-ic{ font-size:24px; margin-bottom:2px; }
+  .wx-hl{ margin-top:4px; font-weight:600; font-size:12px; opacity:.92; }
+  .wx-f{ grid-column:1 / -1; font:italic 500 12px var(--sys); opacity:.85; margin-top:4px; }
+  .grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:16px 6px; margin-top:20px; }
+  .ic{ position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; }
+  .ico{ position:relative; width:62px; height:62px; border-radius:15px; display:grid; place-items:center; font-size:31px; background:var(--bg);
+    box-shadow:0 4px 12px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.35); transition:transform .15s; }
+  .ic:active .ico{ transform:scale(.9); }
+  .ico.cal{ display:flex; flex-direction:column; color:#111; gap:0; }
+  .ico.cal small{ font:600 10px/1 var(--sys); color:#ff3b30; letter-spacing:.04em; margin-top:2px; }
+  .ico.cal b{ font:300 32px/1 var(--sys); }
+  .lbl{ font:500 11.5px/1.2 var(--sys); text-shadow:0 1px 3px rgba(0,0,0,.35); white-space:nowrap; max-width:84px; overflow:hidden; text-overflow:ellipsis; }
+  .badge{ position:absolute; top:-6px; left:calc(50% + 18px); min-width:22px; height:22px; padding:0 6px; border-radius:11px; background:#ff3b30; color:#fff;
+    font:600 13px/22px var(--sys); text-align:center; box-shadow:0 2px 6px rgba(0,0,0,.25); transform:scale(0); transition:transform .35s cubic-bezier(.3,1.6,.5,1); }
+  .ic.next .badge, .ic.always .badge{ transform:scale(1); }
+  .ic.next .ico{ animation:nudge 1.7s ease-in-out infinite; box-shadow:0 0 0 3px rgba(255,255,255,.75), 0 6px 18px rgba(0,0,0,.25); }
+  @keyframes nudge{ 0%,55%,100%{ transform:none; } 65%{ transform:rotate(-8deg) scale(1.08); } 75%{ transform:rotate(7deg) scale(1.08); } 85%{ transform:rotate(-3deg); } }
+  .ic.done .ico::after{ content:"✓"; position:absolute; right:-4px; bottom:-4px; width:20px; height:20px; border-radius:50%; background:#30d158; color:#fff;
+    font:700 12px/20px var(--sys); text-align:center; box-shadow:0 2px 6px rgba(0,0,0,.25); }
+  #phone.focus .ic.noisy .badge{ transform:scale(0); }
+  .hint{ margin:auto auto 12px; padding:11px 18px; border-radius:99px; background:rgba(255,255,255,.22); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
+    font:500 14.5px var(--sys); text-align:center; animation:hint 1.8s ease-in-out infinite; box-shadow:0 6px 20px rgba(20,0,40,.2); }
+  .hint b{ font-weight:700; }
+  .dock{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; padding:12px 8px; border-radius:30px; background:rgba(255,255,255,.2);
+    -webkit-backdrop-filter:blur(22px); backdrop-filter:blur(22px); }
+  .dock .lbl{ display:none; }
+  .batw{ display:none; grid-template-columns:repeat(4,1fr); margin-top:18px; padding:13px 8px 10px; border-radius:22px;
+    background:rgba(255,255,255,.2); -webkit-backdrop-filter:blur(22px); backdrop-filter:blur(22px); }
+  @media (min-height:780px){ .batw{ display:grid; } }
+  #s-home.enter .batw{ animation:icin .7s cubic-bezier(.2,.9,.3,1.1) both; animation-delay:.28s; }
+  .batw div{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .br{ width:50px; height:50px; border-radius:50%; display:grid; place-items:center; font-size:21px; transition:background .4s;
+    background:radial-gradient(closest-side, rgba(45,22,70,.6) 79%, transparent 81%), conic-gradient(var(--c) calc(var(--p) * 1%), rgba(255,255,255,.25) 0); }
+  .batw b{ font:600 13px var(--sys); text-shadow:0 1px 3px rgba(0,0,0,.25); }
+  @media (max-height:700px){
+    #s-home{ padding-top:calc(36px + var(--top)); }
+    .wx{ padding:11px 14px 10px; } .wx-big{ font-size:38px; }
+    .grid{ gap:11px 6px; margin-top:14px; }
+    .ico{ width:54px; height:54px; font-size:27px; border-radius:13px; }
+    .ico.cal b{ font-size:27px; }
+    .dock{ padding:9px 8px; }
+    .hint{ margin-bottom:9px; padding:9px 16px; }
+    .lk-time{ font-size:70px; }
+    #s-lock{ padding-top:calc(36px + var(--top)); }
+    .nt{ padding:8px 12px; } .nt .ai{ width:30px; height:30px; font-size:17px; }
+  }
+
+  /* ---------- apps (shared) ---------- */
+  .app{ position:absolute; inset:0; z-index:20; display:flex; flex-direction:column; background:#fff; color:#111; overflow:hidden;
+    border-radius:44px; transform:scale(.12); transform-origin:var(--ox, 50%) var(--oy, 50%); opacity:0; visibility:hidden;
+    transition:transform .5s cubic-bezier(.2,.85,.25,1), opacity .3s, border-radius .5s, visibility 0s linear .5s; }
+  .app.open{ transform:none; opacity:1; border-radius:0; visibility:visible; transition:transform .5s cubic-bezier(.2,.85,.25,1), opacity .2s, border-radius .5s; }
+  .app-hd{ position:relative; z-index:3; flex:none; display:flex; align-items:center; gap:10px; min-height:calc(86px + var(--top)); padding:calc(34px + var(--top)) 14px 8px;
+    border-bottom:1px solid var(--sep); background:rgba(255,255,255,.94); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); }
+  .back{ flex:none; font:400 17px var(--sys); color:var(--blue); padding:8px 6px; min-width:44px; }
+  .hd-t{ font:700 17px var(--sys); }
+  .app-bd{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:16px 16px calc(120px + var(--bot)); }
+  .donebar{ position:absolute; z-index:5; left:0; right:0; bottom:0; padding:16px 20px calc(18px + var(--bot)); display:flex; justify-content:center;
+    pointer-events:none; opacity:0; transform:translateY(24px); transition:opacity .45s, transform .45s cubic-bezier(.2,.9,.3,1.2); }
+  .donebar.on{ opacity:1; transform:none; }
+  .donebar button{ pointer-events:auto; padding:15px 28px; border-radius:99px; background:#16121c; color:#fff; font:600 16px var(--sys);
+    box-shadow:0 10px 30px rgba(0,0,0,.3); animation:breathe 1.9s ease-in-out infinite; }
+  .donebar button::before{ content:"⌂  "; }
+  .more{ position:absolute; z-index:4; left:50%; bottom:calc(22px + var(--bot)); transform:translateX(-50%); padding:8px 14px; border-radius:99px;
+    background:rgba(20,16,28,.82); color:#fff; font:600 13px var(--sys); pointer-events:none; animation:hint 1.6s ease-in-out infinite; transition:opacity .4s; }
+  .more.off{ opacity:0; }
+  .pl{ position:absolute; left:50%; top:50%; width:58px; height:58px; margin:-29px 0 0 -29px; border-radius:50%; background:rgba(0,0,0,.42);
+    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); display:grid; place-items:center; color:#fff; font-size:22px; padding-left:4px;
+    border:2px solid rgba(255,255,255,.75); animation:plp 1.6s ease-in-out infinite; }
+  .pl.sm{ width:38px; height:38px; margin:-19px 0 0 -19px; font-size:14px; padding-left:3px; }
+  @keyframes plp{ 50%{ transform:scale(1.1); } }
+  .vcard{ position:relative; display:block; width:min(100%, 270px); aspect-ratio:2/3; margin:8px auto 16px; border-radius:20px; overflow:hidden; background:#000;
+    box-shadow:0 14px 34px rgba(0,0,0,.22); }
+  .vcard img{ width:100%; height:100%; object-fit:cover; }
+  .vcard .cap{ position:absolute; left:10px; right:10px; bottom:10px; padding:7px 10px; border-radius:12px; background:rgba(0,0,0,.55); color:#fff;
+    font:600 12.5px var(--sys); text-align:center; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+  .card{ background:#fff; border-radius:16px; padding:14px 16px; margin-bottom:12px; box-shadow:0 2px 12px rgba(60,30,20,.06); }
+  .cta{ display:block; width:100%; padding:16px; border-radius:15px; color:#fff; font:700 17px var(--sys); text-align:center;
+    background:linear-gradient(135deg,#e0313f,#9b2318); box-shadow:0 10px 26px rgba(160,30,40,.3); animation:breathe 2s ease-in-out infinite; }
+  @keyframes popin{ from{ opacity:0; transform:scale(.6); } }
+  .fadein{ animation:rise .6s cubic-bezier(.2,.8,.3,1) both; }
+
+  /* ---------- Team Body (messages) ---------- */
+  #a-msg .app-hd{ gap:8px; }
+  .gav{ display:flex; padding-left:8px; }
+  .gav span{ width:32px; height:32px; border-radius:50%; display:grid; place-items:center; font-size:16px; margin-left:-9px; border:2px solid #fff; background:#f2f2f7; }
+  .ttl b{ display:block; font:600 16px/1.2 var(--sys); }
+  .ttl small{ font:400 12.5px var(--sys); color:#8e8e93; }
+  .chat{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:10px 12px 18px; display:flex; flex-direction:column; gap:3px; }
+  .chat > :first-child{ margin-top:auto; }
+  .day{ align-self:center; margin:14px 0 6px; font:600 11.5px var(--sys); color:#8e8e93; text-transform:uppercase; letter-spacing:.03em; }
+  .sys{ align-self:center; margin:10px 0 8px; padding:6px 11px; border-radius:10px; background:#f2f2f7; font:500 12.5px var(--sys); color:#6b6b70; animation:popin .4s both; }
+  .row{ display:flex; align-items:flex-end; gap:7px; max-width:86%; animation:bub .38s cubic-bezier(.2,.9,.3,1.25) both; }
+  @keyframes bub{ from{ opacity:0; transform:translateY(10px) scale(.9); } }
+  .row.in{ align-self:flex-start; }
+  .row.out{ align-self:flex-end; margin-top:8px; }
+  .row .av{ width:28px; height:28px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:15px; background:#f2f2f7;
+    background:color-mix(in srgb, var(--c) 20%, #fff); }
+  .row.cont .av{ visibility:hidden; }
+  .nm{ display:block; font:600 11.5px var(--sys); color:var(--c); margin:8px 0 2px 11px; }
+  .bub{ position:relative; display:block; padding:9px 13px; border-radius:19px; font:400 16px/1.32 var(--sys); background:#e9e9eb; color:#111; overflow-wrap:anywhere; }
+  .row.out .bub{ background:linear-gradient(160deg,#ff8a7a,#ff6f9c); color:#fff; }
+  .rx{ position:absolute; top:-13px; right:-10px; padding:2px 7px; border-radius:12px; background:#fff; box-shadow:0 1px 5px rgba(0,0,0,.2); font:600 12px/1.4 var(--sys); color:#333;
+    animation:popin .4s cubic-bezier(.3,1.6,.5,1) both; white-space:nowrap; }
+  .bub.vid{ padding:0; width:168px; aspect-ratio:2/3; overflow:hidden; background:#000; border-radius:18px; }
+  .bub.vid img{ width:100%; height:100%; object-fit:cover; }
+  .du{ position:absolute; right:8px; bottom:8px; padding:2px 7px; border-radius:8px; background:rgba(0,0,0,.55); color:#fff; font:600 11px var(--sys); }
+  .bub.dots{ display:flex; gap:4px; padding:13px 14px; }
+  .bub.dots i{ width:7px; height:7px; border-radius:50%; background:#9a9aa0; animation:dot 1.2s infinite; }
+  .bub.dots i:nth-child(2){ animation-delay:.15s; } .bub.dots i:nth-child(3){ animation-delay:.3s; }
+  @keyframes dot{ 0%,60%,100%{ transform:none; opacity:.5; } 30%{ transform:translateY(-4px); opacity:1; } }
+  .ff{ position:absolute; z-index:4; left:50%; top:calc(96px + var(--top)); transform:translateX(-50%); padding:7px 13px; border-radius:99px;
+    background:rgba(20,16,28,.78); color:#fff; font:500 12.5px var(--sys); white-space:nowrap; pointer-events:none; transition:opacity .6s; }
+  .ff.off{ opacity:0; }
+  .compose{ flex:none; border-top:1px solid var(--sep); padding:8px 10px calc(8px + var(--bot)); background:#fff; }
+  .qr{ display:none; flex-wrap:wrap; justify-content:center; gap:8px; padding:2px 2px 9px; }
+  .qr.on{ display:flex; }
+  .qr button{ flex:none; padding:10px 15px; border-radius:99px; border:1.5px solid #ff7a8a; color:#f2456c; font:600 15px var(--sys); background:#fff3f6; animation:popin .4s both; }
+  .inp{ display:flex; align-items:center; gap:8px; }
+  .inp span{ flex:1; padding:9px 14px; border:1px solid #d1d1d6; border-radius:20px; color:#b0b0b6; font:400 16px var(--sys); }
+  .inp i{ width:32px; height:32px; border-radius:50%; background:#ff6f9c; color:#fff; display:grid; place-items:center; font:700 16px var(--sys); font-style:normal; }
+  #a-msg .donebar{ bottom:var(--cb, 58px); padding-bottom:10px; }
+  #a-msg.fin .chat{ padding-bottom:78px; }
+
+  /* ---------- Health ---------- */
+  #a-health{ background:#f2f2f7; }
+  #a-health .app-hd{ background:rgba(242,242,247,.94); }
+  .h-title{ display:flex; justify-content:space-between; align-items:flex-end; margin:2px 2px 14px; }
+  .h-title h1{ font:800 32px/1 var(--sys); }
+  .h-title p{ font:500 13.5px var(--sys); color:#8e8e93; margin-top:6px; }
+  .h-title img{ width:46px; height:46px; border-radius:50%; box-shadow:0 0 0 2px #fff, 0 3px 10px rgba(0,0,0,.15); }
+  .hc{ background:#fff; border-radius:16px; padding:14px 16px; margin-bottom:12px; opacity:0; transform:translateY(18px); transition:opacity .6s, transform .6s cubic-bezier(.2,.8,.3,1); }
+  .hc.in{ opacity:1; transform:none; }
+  .hh{ display:flex; justify-content:space-between; align-items:center; font:600 14.5px var(--sys); color:var(--c); }
+  .hh span{ color:#8e8e93; font-weight:400; font-size:13px; }
+  .mv{ display:flex; align-items:center; gap:16px; margin-top:10px; }
+  .big{ font:700 30px/1.05 var(--round); color:#111; }
+  .big small{ font:600 14px var(--sys); color:#8e8e93; margin-left:5px; }
+  .big.muted{ color:#c7c7cc; }
+  .big.red{ color:#e0313f; }
+  .big.sm{ font-size:22px; }
+  .nt2{ font:400 14.5px/1.42 var(--sys); color:#3c3c43; margin-top:8px; }
+  .ring{ width:62px; height:62px; transform:rotate(-90deg); flex:none; }
+  .ring circle{ fill:none; stroke-width:8; }
+  .ring .bg{ stroke:#ffe9cc; }
+  .ring .fg{ stroke:#ff9f0a; stroke-linecap:round; stroke-dasharray:163.4; stroke-dashoffset:163.4; transition:stroke-dashoffset 1.8s cubic-bezier(.3,.8,.3,1) .3s; }
+  .spark{ width:112px; height:42px; flex:none; overflow:visible; }
+  .spark path{ fill:none; stroke:#ff6b9a; stroke-width:3.5; stroke-linecap:round; stroke-dasharray:130; stroke-dashoffset:130; transition:stroke-dashoffset 1.8s .3s; }
+  .hc.in .spark path{ stroke-dashoffset:0; }
+  .pbar{ flex:1; height:10px; border-radius:6px; background:#f1e7ff; overflow:hidden; }
+  .pbar i{ display:block; height:100%; width:0; border-radius:6px; background:linear-gradient(90deg,#bf5af2,#7d5cff); transition:width 1.8s cubic-bezier(.3,.8,.3,1) .3s; }
+  .hc.in .pbar i{ width:var(--w); }
+  .pepbar{ margin-top:10px; height:12px; border-radius:7px; background:#f6e3e0; overflow:hidden; }
+  .pepbar i{ display:block; width:3%; height:100%; background:#e0313f; animation:blinkbar 1s steps(2) infinite; }
+  @keyframes blinkbar{ 50%{ opacity:.3; } }
+  .rx-card{ background:#fffdf5; border:1px solid #ece0c2; box-shadow:0 2px 12px rgba(120,90,20,.08); }
+  .rx-top{ display:flex; gap:12px; align-items:center; padding-bottom:10px; border-bottom:1.5px dashed #e3d4ad; }
+  .rx-sym{ font:700 34px/1 Georgia, serif; color:#8a5a1a; }
+  .rx-top b{ display:block; font:700 16px var(--sys); color:#3a2a10; }
+  .rx-top small{ font:italic 400 12.5px var(--sys); color:#8a7650; }
+  .rx-list{ list-style:none; counter-reset:rx; margin-top:10px; }
+  .rx-list li{ counter-increment:rx; display:grid; grid-template-columns:22px 1fr; gap:2px 6px; padding:7px 0; font:400 14.5px/1.4 var(--sys); color:#3c3220; }
+  .rx-list li::before{ content:counter(rx) "."; grid-row:span 2; font-weight:700; color:#b08a40; }
+  .rx-list li b{ font-weight:700; color:#1c160a; }
+  .rx-sign{ display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+  .sig-h{ font:700 30px/1 var(--hand); color:#3b3fb0; transform:rotate(-4deg); }
+  .stamp{ padding:5px 10px; border:2.5px solid #e0313f; border-radius:8px; color:#e0313f; font:800 13px var(--sys); letter-spacing:.12em; transform:rotate(-8deg); opacity:.85; }
+  .real{ font:400 13px/1.5 var(--sys); color:#6b6b70; text-align:center; padding:4px 14px 16px; text-wrap:balance; }
+
+  /* ---------- Pepero Express ---------- */
+  #a-pep{ background:#fff7ef; }
+  #a-pep .app-hd{ background:linear-gradient(135deg,#e0313f,#a5161f); color:#fff; border:0; }
+  #a-pep .back{ color:#fff; }
+  .pp-brand{ font:800 19px/1.2 var(--round); }
+  .pp-brand small{ display:block; font:500 12px var(--sys); opacity:.85; margin-top:2px; }
+  .pp-hero{ padding:4px 2px 12px; }
+  .pp-hero b{ display:block; font:800 24px var(--round); color:#3a1a10; }
+  .pp-hero span{ font:400 14.5px var(--sys); color:#8a6a5a; }
+  .item{ display:flex; align-items:center; gap:12px; padding:10px 0; border-top:1px solid #f4e8dc; }
+  .item:first-child{ border:0; }
+  .item .e{ font-size:26px; width:34px; text-align:center; flex:none; }
+  .item b{ display:block; font:600 15px var(--sys); color:#2b1a12; }
+  .item span{ font:400 13px var(--sys); color:#8a7a6a; }
+  .item em{ margin-left:auto; font:700 13.5px var(--sys); color:#e0313f; font-style:normal; white-space:nowrap; }
+  .pnote{ background:#fff1c9; border-radius:14px; padding:12px 14px; margin-bottom:12px; font:500 14.5px/1.45 var(--sys); color:#5e4500; }
+  .tot{ display:flex; justify-content:space-between; align-items:center; }
+  .tot div{ font:700 17px var(--sys); color:#2b1a12; }
+  .tot small{ display:block; font:400 12.5px var(--sys); color:#8a7a6a; }
+  .tot > b{ font:800 26px var(--round); color:#2b1a12; }
+  .map{ position:relative; height:200px; border-radius:16px; overflow:hidden; background:#f3ede3; margin-bottom:12px; box-shadow:0 2px 12px rgba(60,30,20,.08); }
+  .map svg{ width:100%; height:100%; display:block; }
+  .eta{ position:absolute; top:10px; left:10px; padding:7px 11px; border-radius:11px; background:#fff; color:#2b1a12; font:700 13.5px var(--sys); box-shadow:0 2px 10px rgba(0,0,0,.12); }
+  .rider{ display:flex; gap:12px; align-items:center; }
+  .rider .av{ width:46px; height:46px; border-radius:50%; flex:none; background:#e7f0ff; display:grid; place-items:center; font-size:24px; }
+  .rider b{ display:block; font:700 15.5px var(--sys); color:#2b1a12; }
+  .rider span{ font:400 13px/1.35 var(--sys); color:#8a7a6a; }
+  .rider em{ margin-left:auto; font:700 13px var(--sys); color:#e3a008; font-style:normal; white-space:nowrap; }
+  .status{ font:600 14.5px/1.4 var(--sys); color:#6b4a38; min-height:22px; margin:2px 2px 12px; }
+  .status.swap{ animation:rise .5s both; }
+  .tl{ list-style:none; padding:4px 2px; }
+  .tl li{ position:relative; padding:0 0 15px 30px; font:600 14.5px var(--sys); color:#c2b4a6; transition:color .4s; }
+  .tl li::before{ content:""; position:absolute; left:4px; top:1px; width:14px; height:14px; border-radius:50%; border:2px solid #dccdbc; background:#fff7ef; transition:.4s; }
+  .tl li::after{ content:""; position:absolute; left:11px; top:19px; width:2px; height:12px; background:#e8dccd; }
+  .tl li:last-child::after{ display:none; }
+  .tl li.ok{ color:#2b1a12; }
+  .tl li.ok::before{ background:#30d158; border-color:#30d158; }
+  .tl li.now{ color:#e0313f; }
+  .tl li.now::before{ border-color:#e0313f; box-shadow:0 0 0 0 rgba(224,49,63,.5); animation:ping 1.2s infinite; }
+  @keyframes ping{ 70%{ box-shadow:0 0 0 9px rgba(224,49,63,0); } 100%{ box-shadow:0 0 0 0 rgba(224,49,63,0); } }
+  .pp-d{ font:800 26px var(--round); color:#2b1a12; text-align:center; margin-top:6px; }
+  .box{ position:relative; display:block; width:180px; height:160px; margin:22px auto 8px; }
+  .box .base{ position:absolute; left:12px; right:12px; bottom:0; height:112px; border-radius:12px; background:linear-gradient(90deg,#c81d2e,#ec3a4c 50%,#c81d2e);
+    box-shadow:inset 0 -10px 0 rgba(0,0,0,.08), 0 12px 24px rgba(160,30,40,.25); display:grid; place-items:center; }
+  .box .base span{ font:800 22px var(--round); color:#fff; letter-spacing:.04em; text-shadow:0 2px 0 rgba(0,0,0,.15); }
+  .box .base::before{ content:""; position:absolute; left:50%; top:0; bottom:0; width:18px; margin-left:-9px; background:#ffd166; }
+  .box .lid{ position:absolute; left:0; right:0; top:30px; height:36px; border-radius:9px; background:#e8394b; box-shadow:0 5px 0 rgba(0,0,0,.08);
+    transition:transform .8s cubic-bezier(.3,1.3,.5,1), opacity .8s; z-index:2; }
+  .box .lid::before{ content:""; position:absolute; left:50%; top:0; bottom:0; width:18px; margin-left:-9px; background:#ffd166; }
+  .bow{ position:absolute; left:50%; top:-24px; width:58px; height:30px; margin-left:-29px; }
+  .bow::before, .bow::after{ content:""; position:absolute; top:0; width:28px; height:28px; border:7px solid #ffd166; border-radius:50% 50% 0 50%; }
+  .bow::before{ left:0; transform:rotate(-20deg); } .bow::after{ right:0; transform:scaleX(-1) rotate(-20deg); }
+  .box:not(.open){ animation:wob 1.6s ease-in-out infinite; }
+  @keyframes wob{ 0%,70%,100%{ transform:none; } 78%{ transform:rotate(-4deg); } 86%{ transform:rotate(4deg); } 94%{ transform:rotate(-2deg); } }
+  .box.open .lid{ transform:translate(-40px,-150px) rotate(-30deg); opacity:0; }
+  .box .inside{ position:absolute; left:34px; right:34px; bottom:86px; height:70px; display:flex; justify-content:space-between; align-items:flex-end;
+    opacity:0; transform:translateY(40px); transition:opacity .4s .25s, transform .7s cubic-bezier(.3,1.5,.5,1) .25s; }
+  .box.open .inside{ opacity:1; transform:none; }
+  .box .inside i{ width:9px; height:70px; border-radius:5px; background:linear-gradient(#f0cd96 0 24%, #5c3222 24%); transform:rotate(calc(var(--r, 0) * 1deg)); }
+  .box .inside i.alm{ background:linear-gradient(#f0cd96 0 24%, #7a4a2e 24%); height:62px; --r:-6; }
+  .box .inside i.wht{ background:linear-gradient(#f0cd96 0 24%, #f6efe4 24%); height:66px; --r:5; }
+  .box .inside i:nth-child(1){ --r:-10; height:60px; } .box .inside i:nth-child(5){ --r:8; height:64px; }
+  .tapme{ text-align:center; font:700 15px var(--sys); color:#e0313f; animation:hint 1.6s ease-in-out infinite; margin-bottom:10px; }
+  .stick{ position:absolute; z-index:90; width:7px; height:58px; border-radius:4px; pointer-events:none; background:linear-gradient(#f0cd96 0 22%, #5c3222 22%); }
+  .stick.alm{ background:linear-gradient(#f0cd96 0 22%, #7a4a2e 22%); }
+  .stick.wht{ background:linear-gradient(#f0cd96 0 22%, #f6efe4 22%); box-shadow:0 0 0 1px rgba(0,0,0,.06); }
+  .pp-ok{ text-align:center; font:600 16px var(--sys); color:#2b1a12; margin:6px 0 4px; }
+  .pp-rate{ text-align:center; font:600 14px var(--sys); color:#6b4a38; margin-top:-4px; }
+  .pp-rate small{ display:block; font-weight:400; color:#8a7a6a; margin-top:2px; }
+
+  /* ---------- Stride ---------- */
+  .st-logo{ font:900 21px var(--round); color:#fc5200; letter-spacing:.06em; }
+  .ath{ display:flex; gap:10px; align-items:center; }
+  .ath img{ width:44px; height:44px; border-radius:50%; }
+  .ath b{ display:block; font:600 15.5px var(--sys); }
+  .ath span{ font:400 12.5px var(--sys); color:#6b6b70; }
+  .ath em{ margin-left:auto; padding:5px 9px; border-radius:9px; background:#fff1ea; color:#d44400; font:700 12px var(--sys); font-style:normal; white-space:nowrap; }
+  .st-title{ font:700 25px/1.2 var(--sys); margin:14px 0 4px; }
+  .st-desc{ font:400 15px/1.45 var(--sys); color:#3c3c43; }
+  .stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:16px 0 14px; }
+  .stats div{ font:400 12px var(--sys); color:#6b6b70; }
+  .stats b{ display:block; font:700 19px/1.2 var(--round); color:#111; margin-top:3px; }
+  .route{ height:180px; border-radius:16px; overflow:hidden; background:#eef1f4; }
+  .route svg{ width:100%; height:100%; display:block; }
+  .rt{ fill:none; stroke:#fc5200; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:var(--len, 1000); stroke-dashoffset:var(--len, 1000);
+    transition:stroke-dashoffset 2.8s cubic-bezier(.4,.1,.3,1) .2s; }
+  .route.in .rt{ stroke-dashoffset:0; }
+  .wk{ background:#fff1ea; border-radius:14px; padding:12px 14px; font:500 14px/1.4 var(--sys); color:#7a2e00; margin:12px 0 18px; }
+  .st-h{ font:700 17px var(--sys); margin:18px 0 6px; }
+  .photo{ width:min(100%, 270px); margin:0 auto; border-radius:18px; overflow:hidden; box-shadow:0 10px 26px rgba(0,0,0,.15); }
+  .photo-cap{ font:400 13.5px var(--sys); color:#6b6b70; margin:8px 2px 4px; }
+  .badges{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .bdg{ text-align:center; opacity:0; transform:scale(.6); transition:opacity .5s, transform .55s cubic-bezier(.3,1.6,.5,1); }
+  .bdg.in{ opacity:1; transform:none; }
+  .bdg .c{ display:grid; place-items:center; width:64px; height:64px; margin:0 auto 7px; border-radius:50%; font-size:30px;
+    background:linear-gradient(135deg,#ffb27a,#fc5200); box-shadow:0 6px 16px rgba(252,82,0,.3), inset 0 2px 0 rgba(255,255,255,.4); }
+  .bdg b{ display:block; font:700 13px/1.2 var(--sys); }
+  .bdg span{ font:400 11.5px/1.3 var(--sys); color:#6b6b70; }
+  .kudos{ margin:20px 0 14px; padding:14px; border-radius:16px; background:#f6f6f8; }
+  .kd-h{ font:400 14px var(--sys); color:#3c3c43; margin-bottom:10px; }
+  .cmt{ display:flex; gap:10px; }
+  .cmt .av{ width:36px; height:36px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:19px; background:#e7f0ff; }
+  .cmt b{ font:600 13.5px var(--sys); }
+  .cmt p{ font:400 15px/1.4 var(--sys); color:#1c1c1e; margin-top:1px; }
+  .btn-st{ display:block; width:100%; padding:16px; border-radius:15px; background:#fc5200; color:#fff; font:700 16.5px var(--sys); text-align:center;
+    box-shadow:0 10px 26px rgba(252,82,0,.3); animation:breathe 2s ease-in-out infinite; }
+  .btn-st.used{ animation:none; background:#ffd9c4; color:#a33a00; box-shadow:none; }
+  .kd-msg{ text-align:center; font:600 15px/1.4 var(--sys); color:#d44400; margin-top:12px; opacity:0; transform:translateY(8px); transition:.5s; }
+  .kd-msg.on{ opacity:1; transform:none; }
+  .thumb{ position:absolute; z-index:90; font-size:30px; pointer-events:none; }
+
+  /* ---------- SplitLoad ---------- */
+  #a-split{ background:#f3faf7; }
+  #a-split .app-hd{ background:rgba(243,250,247,.94); }
+  .sl-logo{ font:800 19px/1.2 var(--round); color:#0f9c7a; }
+  .sl-logo small{ display:block; font:500 12px var(--sys); color:#6b8b82; margin-top:2px; }
+  .vrow{ display:flex; align-items:center; gap:14px; width:100%; padding:10px; border-radius:18px; background:#fff; box-shadow:0 2px 12px rgba(0,60,40,.07); }
+  .vrow .th{ position:relative; width:74px; aspect-ratio:2/3; border-radius:12px; overflow:hidden; flex:none; background:#000; }
+  .vrow .th img{ width:100%; height:100%; object-fit:cover; }
+  .vrow b{ display:block; font:700 16px var(--sys); color:#123; }
+  .vrow small{ font:500 13px var(--sys); color:#0f9c7a; }
+  .sl-intro{ font:400 15px/1.45 var(--sys); color:#2a3a35; margin:16px 2px 12px; }
+  .sl-intro b{ font-weight:700; }
+  .bal{ display:flex; height:12px; border-radius:8px; overflow:hidden; background:#e3ebe8; }
+  .bal i{ display:block; width:100%; background:linear-gradient(90deg,#ff8a7a,#ff6f9c); transition:width .6s cubic-bezier(.3,.8,.3,1); }
+  .bal u{ display:block; width:0; background:linear-gradient(90deg,#3ee0b5,#13a985); transition:width .6s cubic-bezier(.3,.8,.3,1); }
+  .bal-l{ display:flex; justify-content:space-between; font:600 12px var(--sys); color:#6b8b82; margin:5px 2px 12px; }
+  .plate{ background:#fff; border-radius:18px; padding:14px; margin-bottom:10px; box-shadow:0 2px 12px rgba(0,60,40,.06); }
+  .plate h3{ display:flex; justify-content:space-between; font:700 15px var(--sys); color:#123; }
+  .plate h3 span{ min-width:28px; padding:2px 8px; border-radius:9px; background:#ffe9ec; color:#e0456a; font:700 13px var(--sys); text-align:center; }
+  .plate.his h3 span{ background:#dcf7ee; color:#0f9c7a; }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; min-height:42px; }
+  .chip{ padding:9px 12px; border-radius:12px; background:#fff4f6; border:1px solid #ffd5de; font:600 14px var(--sys); color:#3a1a24; position:relative; }
+  .chip.no{ animation:shake .45s; }
+  @keyframes shake{ 20%{ transform:translateX(-6px) rotate(-2deg); } 40%{ transform:translateX(5px) rotate(2deg); } 60%{ transform:translateX(-4px); } 80%{ transform:translateX(3px); } }
+  .chip.kept{ background:#f4f4f6; border-color:#e5e5ea; color:#6b6b70; }
+  .his .chip{ background:#e8faf3; border-color:#bdeedd; color:#0d3b2e; }
+  .empty{ font:italic 400 14px var(--sys); color:#9aa8a3; align-self:center; }
+  .reply{ display:flex; gap:10px; align-items:flex-start; min-height:54px; margin:2px 4px 12px; font:400 14.5px/1.4 var(--sys); color:#24332e; }
+  .reply .av{ width:32px; height:32px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:17px; background:#e7f0ff; }
+  .reply > span:last-child{ padding:9px 12px; border-radius:16px; background:#fff; box-shadow:0 2px 8px rgba(0,60,40,.06); }
+  .reply.pop{ animation:bub .4s cubic-bezier(.2,.9,.3,1.25) both; }
+  .settle{ border-radius:20px; padding:20px 18px; text-align:center; color:#fff; background:linear-gradient(135deg,#13a985,#0b7f64); box-shadow:0 14px 30px rgba(15,140,110,.3); animation:popin .6s cubic-bezier(.3,1.4,.5,1) both; margin-top:6px; }
+  .settle h3{ font:800 24px var(--round); margin-bottom:10px; }
+  .srow{ display:flex; justify-content:space-between; padding:9px 4px; border-top:1px solid rgba(255,255,255,.22); font:500 15px var(--sys); }
+  .srow b{ font-weight:800; }
+  .settle small{ display:block; margin-top:10px; font:italic 400 13px var(--sys); opacity:.85; }
+
+  /* ---------- Notes ---------- */
+  #a-notes{ background:#fffdf7; }
+  #a-notes .app-hd{ background:rgba(255,253,247,.95); justify-content:space-between; }
+  #a-notes .back{ color:#d99a00; }
+  .nt-ic{ color:#d99a00; font:700 20px var(--sys); padding:0 6px; }
+  .nt-meta{ text-align:center; font:400 12.5px var(--sys); color:#8e8e93; margin:2px 0 16px; }
+  .nt-title{ font:800 32px/1.15 var(--sys); color:#1c1c1e; min-height:38px; margin-bottom:10px; }
+  .caret{ display:inline-block; width:2.5px; height:30px; background:#e0a100; vertical-align:-4px; margin-left:2px; animation:blink 1s steps(1) infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .note-body{ color:#1c1c1e; }
+  .note-body p, .note-body li{ font:400 17px/1.55 var(--sys); }
+  .note-body .blk{ margin-bottom:14px; opacity:0; transform:translateY(10px); transition:opacity .7s, transform .7s cubic-bezier(.2,.8,.3,1); }
+  .note-body .blk.in{ opacity:1; transform:none; }
+  .note-body .def{ font-weight:700; font-size:19px; }
+  .note-body .ipa{ color:#8e8e93; }
+  .note-body ul{ padding-left:22px; margin-top:4px; }
+  .note-body li{ margin-bottom:2px; }
+  .note-body li::marker{ color:#e0a100; }
+  .note-body hr{ border:0; border-top:1.5px dashed #e5dcc4; margin:22px 0; }
+  .note-body .kill{ font-weight:700; }
+  .note-body .kill b{ background:linear-gradient(transparent 60%, #ffe58a 60%); }
+
+  /* ---------- Control Center ---------- */
+  #cc{ position:absolute; inset:0; z-index:70; padding:calc(54px + var(--top)) 18px 20px; color:#fff;
+    background:rgba(14,8,22,.42); -webkit-backdrop-filter:blur(28px) saturate(1.3); backdrop-filter:blur(28px) saturate(1.3);
+    opacity:0; visibility:hidden; transform:translateY(-40px); transition:opacity .45s, transform .5s cubic-bezier(.2,.9,.3,1), visibility 0s linear .5s; }
+  #cc.on{ opacity:1; visibility:visible; transform:none; transition:opacity .45s, transform .5s cubic-bezier(.2,.9,.3,1); }
+  .cc-hint{ font:600 16px var(--sys); text-align:center; margin-bottom:16px; animation:hint 1.8s ease-in-out infinite; }
+  .cc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:360px; margin:0 auto; }
+  .tile{ border-radius:24px; background:rgba(255,255,255,.15); padding:14px; }
+  .conn{ display:grid; grid-template-columns:1fr 1fr; gap:10px; justify-items:center; }
+  .conn i{ width:50px; height:50px; border-radius:50%; display:grid; place-items:center; font:600 20px var(--sys); font-style:normal; background:rgba(255,255,255,.18); }
+  .conn i.on{ background:#0a84ff; } .conn i.on2{ background:#30d158; }
+  .np2{ display:flex; flex-direction:column; justify-content:space-between; gap:8px; }
+  .np2 b{ font:600 13.5px/1.3 var(--sys); }
+  .np2 button{ align-self:flex-start; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.2); display:grid; place-items:center; font-size:16px; }
+  .focus-t{ grid-column:1 / -1; display:flex; align-items:center; gap:14px; padding:16px 18px; border-radius:24px; background:rgba(255,255,255,.15); transition:background .5s, color .5s;
+    animation:glow 1.8s ease-in-out infinite; }
+  @keyframes glow{ 50%{ box-shadow:0 0 0 5px rgba(190,170,255,.45); } }
+  .focus-t .m{ width:48px; height:48px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:23px; background:rgba(255,255,255,.2); transition:background .5s; }
+  .focus-t b{ display:block; font:600 18px var(--sys); }
+  .focus-t span span{ font:400 13.5px var(--sys); opacity:.8; }
+  .focus-t.on{ background:#fff; color:#4b2fbf; animation:none; }
+  .focus-t.on .m{ background:#5e3fe0; }
+  .sliders{ display:flex; gap:12px; justify-content:center; }
+  .sld{ position:relative; width:58px; height:132px; border-radius:20px; background:rgba(255,255,255,.18); overflow:hidden; }
+  .sld i{ position:absolute; left:0; right:0; bottom:0; background:#fff; }
+  .sld span{ position:absolute; left:0; right:0; bottom:10px; text-align:center; font-size:19px; }
+  .mini{ display:grid; grid-template-columns:1fr 1fr; gap:10px; justify-items:center; align-content:center; }
+  .mini i{ width:50px; height:50px; border-radius:16px; display:grid; place-items:center; font-size:21px; font-style:normal; background:rgba(255,255,255,.18); }
+  .cc-note{ max-width:360px; margin:16px auto 0; padding:14px 16px; border-radius:20px; background:rgba(255,255,255,.14); font:400 15px/1.55 var(--sys);
+    opacity:0; transform:translateY(10px); transition:opacity .5s, transform .5s; }
+  .cc-note.on{ opacity:1; transform:none; }
+  .cc-note b{ font-weight:700; }
+
+  /* ---------- call ---------- */
+  #s-call{ z-index:80; display:flex; flex-direction:column; align-items:center; text-align:center; padding:calc(64px + var(--top)) 24px calc(40px + var(--bot));
+    background:radial-gradient(120% 80% at 50% 0%, #4a2e6e, #1d1230 60%, #120b1d); }
+  .cl-lbl{ font:500 14px var(--sys); opacity:.7; margin-bottom:16px; }
+  .cl-av{ position:relative; width:108px; height:108px; border-radius:50%; display:grid; place-items:center; font-size:54px; background:linear-gradient(135deg,#6aa8ff,#9b7bff); }
+  #s-call.ringing .cl-av::before, #s-call.ringing .cl-av::after{ content:""; position:absolute; inset:-8px; border-radius:50%; border:2px solid rgba(255,255,255,.4); animation:ripple 2s infinite; }
+  #s-call.ringing .cl-av::after{ animation-delay:1s; }
+  @keyframes ripple{ from{ transform:scale(.92); opacity:1; } to{ transform:scale(1.6); opacity:0; } }
+  .cl-name{ margin-top:18px; font:600 30px var(--sys); }
+  .cl-sub{ margin-top:6px; font:400 15px var(--sys); opacity:.75; }
+  .cl-mid{ display:none; flex-direction:column; align-items:center; width:100%; }
+  #s-call.live .cl-mid, #s-call.voice .cl-mid, #s-call.declined .cl-mid{ display:flex; }
+  .wave{ display:flex; gap:4px; height:34px; align-items:center; margin-top:22px; }
+  .wave i{ width:4px; height:6px; border-radius:2px; background:#fff; opacity:.85; }
+  .wave.talk i{ animation:wv .7s ease-in-out infinite; animation-delay:calc(var(--d) * -1s); }
+  @keyframes wv{ 50%{ height:28px; } }
+  .vn{ display:none; width:100%; max-width:300px; margin-top:18px; padding:10px 14px; border-radius:18px; background:rgba(255,255,255,.12); align-items:center; gap:10px; font:600 13px var(--sys); }
+  #s-call.voice .vn{ display:flex; }
+  .vn .pbar2{ flex:1; height:4px; border-radius:2px; background:rgba(255,255,255,.25); overflow:hidden; }
+  .vn .pbar2 i{ display:block; height:100%; width:0; background:#fff; transition:width .5s linear; }
+  .cap-box{ margin-top:26px; min-height:130px; max-width:330px; font:600 23px/1.42 var(--round); text-wrap:balance; opacity:0; transform:translateY(10px); transition:opacity .45s, transform .45s; }
+  .cap-box.in{ opacity:1; transform:none; }
+  .cap-box.dim{ font:500 17px/1.5 var(--sys); opacity:.85; }
+  .cap-tap{ font:500 12.5px var(--sys); opacity:.5; margin-top:6px; }
+  .cl-btns{ margin-top:auto; display:none; justify-content:space-around; width:100%; max-width:320px; }
+  #s-call.ringing .ring-btns{ display:flex; }
+  #s-call.canend .hang-btns{ display:flex; }
+  .cbtn{ display:flex; flex-direction:column; align-items:center; gap:9px; font:400 13.5px var(--sys); }
+  .cbtn i{ width:74px; height:74px; border-radius:50%; display:grid; place-items:center; }
+  .cbtn svg{ width:32px; height:32px; fill:#fff; }
+  .cbtn.dec i{ background:#ff3b30; }
+  .cbtn.dec svg{ transform:rotate(135deg); }
+  .cbtn.acc i{ background:#34c759; animation:breathe 1.1s ease-in-out infinite; }
+  #s-call.canend .cbtn.dec i{ animation:breathe 1.4s ease-in-out infinite; }
+
+  /* ---------- end ---------- */
+  #s-end{ z-index:85; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#2a1830;
+    padding:calc(40px + var(--top)) 26px calc(28px + var(--bot)); background:linear-gradient(165deg,#ffe2da,#ffd5e6 45%,#e2d8ff); }
+  .chk{ width:92px; height:92px; border-radius:50%; display:grid; place-items:center; background:linear-gradient(135deg,#34c759,#30b0c7);
+    box-shadow:0 14px 30px rgba(48,176,120,.35); }
+  #s-end.on .chk{ animation:popin .7s cubic-bezier(.3,1.6,.5,1) both; }
+  .chk svg{ width:50px; height:50px; }
+  .chk path{ stroke-dasharray:40; stroke-dashoffset:40; }
+  #s-end.on .chk path{ animation:draw .6s .45s forwards; }
+  @keyframes draw{ to{ stroke-dashoffset:0; } }
+  .end-t{ font:800 27px/1.2 var(--round); margin-top:20px; }
+  .end-s{ font:500 15px var(--sys); opacity:.7; margin-top:6px; }
+  .end-chips{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:24px 0; width:100%; max-width:340px; }
+  .end-chips div{ background:rgba(255,255,255,.72); border-radius:16px; padding:12px 13px; text-align:left; font:500 12.5px var(--sys); color:#6b5870; }
+  #s-end.on .end-chips div{ animation:popin .5s cubic-bezier(.3,1.5,.5,1) both; animation-delay:calc(.8s + var(--i) * .15s); }
+  .end-chips b{ display:block; font:700 15.5px var(--sys); color:#2a1830; margin-top:2px; }
+  .end-btns{ display:flex; flex-direction:column; gap:6px; width:100%; max-width:320px; }
+  .btn-end{ padding:16px; border-radius:15px; background:#2a1830; color:#fff; font:700 16.5px var(--sys); text-align:center; box-shadow:0 10px 26px rgba(42,24,48,.25); }
+  .btn-ghost{ padding:12px; font:600 15px var(--sys); color:#6b4a80; text-align:center; }
+  .end-f{ margin-top:14px; font:400 12.5px var(--sys); opacity:.55; }
+
+  /* ---------- video player, toast ---------- */
+  #player{ position:absolute; inset:0; z-index:95; display:grid; place-items:center; background:rgba(0,0,0,.9); opacity:0; visibility:hidden; transition:opacity .3s, visibility 0s linear .3s; }
+  #player.on{ opacity:1; visibility:visible; transition:opacity .3s; }
+  .pl-box{ position:relative; width:86%; width:min(92cqw, calc((100cqh - 150px) * .6667)); aspect-ratio:2/3; }
+  .pl-box video{ width:100%; height:100%; display:block; border-radius:20px; background:#000; object-fit:cover; }
+  .pl-x{ position:absolute; z-index:2; top:calc(16px + var(--top)); right:16px; width:42px; height:42px; border-radius:50%; background:rgba(255,255,255,.18); color:#fff; font:600 18px var(--sys); display:grid; place-items:center; }
+  .pl-end{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; border-radius:20px;
+    background:rgba(0,0,0,.45); opacity:0; visibility:hidden; transition:.3s; }
+  .pl-end.on{ opacity:1; visibility:visible; }
+  .pl-end button{ min-width:180px; padding:14px 22px; border-radius:99px; background:#fff; color:#111; font:700 15.5px var(--sys); text-align:center; }
+  .pl-end button + button{ background:rgba(255,255,255,.2); color:#fff; }
+  .pl-tap{ position:absolute; inset:0; display:none; place-items:center; color:#fff; font:700 17px var(--sys); background:rgba(0,0,0,.35); border-radius:20px; }
+  .pl-tap.on{ display:grid; }
+  #toast{ position:absolute; z-index:99; left:50%; top:calc(44px + var(--top)); width:max-content; max-width:88%; padding:12px 17px; border-radius:17px;
+    background:rgba(28,20,36,.92); color:#fff; font:500 14.5px/1.4 var(--sys); text-align:center; text-wrap:balance; box-shadow:0 10px 30px rgba(0,0,0,.25);
+    opacity:0; transform:translate(-50%,-16px); pointer-events:none; transition:opacity .3s, transform .4s cubic-bezier(.2,.9,.3,1.25); }
+  #toast.on{ opacity:1; transform:translate(-50%,0); }
+
+  /* ---------- in-app browser (Instagram etc.) ---------- */
+  #escape{ position:absolute; inset:0; z-index:200; display:grid; place-items:center; padding:calc(30px + var(--top)) 28px calc(30px + var(--bot));
+    background:linear-gradient(165deg,#3a1f4e,#150c22); text-align:center; }
+  #escape[hidden]{ display:none; }
+  .ebox{ display:flex; flex-direction:column; align-items:center; max-width:330px; }
+  .ebox .logo{ width:84px; height:84px; border-radius:20px; margin-bottom:18px; }
+  .e1{ font:700 12.5px var(--sys); letter-spacing:.16em; text-transform:uppercase; color:#ffb3c6; }
+  .e2{ font:600 21px/1.4 var(--sys); margin-top:10px; text-wrap:balance; }
+  .ebtn{ margin-top:24px; padding:15px 30px; border-radius:99px; background:#fff; color:#2a1830; font:700 16px var(--sys); text-decoration:none; white-space:nowrap;
+    box-shadow:0 10px 30px rgba(255,143,177,.35); animation:breathe 1.8s ease-in-out infinite; }
+  .e3{ margin-top:18px; font:400 13px/1.5 var(--sys); color:#c9bcd6; text-wrap:balance; }
+  .e3 b{ color:#fff; font-weight:600; }
+  #eStay{ margin-top:18px; padding:10px 14px; font:500 13px var(--sys); color:#c9bcd6; text-decoration:underline; text-underline-offset:4px; }
+
+  /* ---------- small bits ---------- */
+  #sb.lock #sbTime{ visibility:hidden; }
+  #s-lock{ touch-action:none; }
+  .ic.no .ico{ animation:shake .45s; }
+  .photo-cap{ text-align:center; }
+  .row .col{ display:flex; flex-direction:column; align-items:flex-start; min-width:0; }
+  .bub.vid{ cursor:pointer; }
+  .bub.emo{ background:none; font-size:38px; line-height:1.1; padding:0 2px; }
+  [data-toast]{ cursor:pointer; }
+  @media (max-height:660px){
+    .lk-wid, .lk-lock{ display:none; }
+    .lk-time{ margin-bottom:12px; }
+    .nt{ padding:7px 12px; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lgJ" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff7a6b"/><stop offset=".55" stop-color="#ff8fb1"/><stop offset="1" stop-color="#b096ff"/>
+    </linearGradient>
+    <symbol id="logoS" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="23" fill="url(#lgJ)"/>
+      <path d="M60 20V31" stroke="#f0cd96" stroke-width="13" stroke-linecap="round" fill="none"/>
+      <path d="M60 31V60a16 16 0 0 1-32 0" stroke="#5c3222" stroke-width="13" stroke-linecap="round" fill="none"/>
+      <path d="M56 37V58" stroke="#8c583e" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+    </symbol>
+    <symbol id="phoneS" viewBox="0 0 24 24">
+      <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="phone">
+  <div id="wall"></div>
+
+  <div id="sb" class="dark">
+    <span id="sbTime">9:41</span>
+    <span class="r">
+      <span id="sbMoon">🌙</span>
+      <span class="sig"><i></i><i></i><i></i><i></i></span>
+      <span class="batt"><span id="battTxt" class="low">🍫 3%</span><span class="cell" id="battCell"><i></i></span></span>
+    </span>
+  </div>
+
+  <!-- ============ software update ============ -->
+  <section id="s-update" class="screen on">
+    <div class="up-nav"><span class="bk">‹ General</span><span>Software Update</span><span></span></div>
+    <div class="up-scroll">
+      <div class="up-card">
+        <div class="up-head">
+          <svg class="logo"><use href="#logoS"/></svg>
+          <div>
+            <h1>JessOS 26.11</h1>
+            <p>Weekend Recovery Update</p>
+            <p class="dim">JessOS Labs · 14 km</p>
+          </div>
+        </div>
+        <p class="up-intro">A recovery update, built for exactly one user after a weekend that was a lot.</p>
+        <h2>What's new</h2>
+        <ul class="up-list">
+          <li><i>🩹</i><span><b>Healing patch</b> for one hand, the backs of some very brave fingers, and a knee.</span></li>
+          <li><i>🎈</i><span><b>Swelling reduction</b>, now running quietly in the background.</span></li>
+          <li><i>💼</i><span><b>Added support</b> for a new role, a new project and a very full plate.</span></li>
+          <li><i>🍫</i><span><b>Pepero:</b> now unlimited.</span></li>
+          <li><i>🏃‍♀️</i><span><b>Performance:</b> 4K on Saturday and 10K on Sunday, with all of the above. Our engineers have no explanation.</span></li>
+          <li><i>🐞</i><span><b>Known issue:</b> refuses to rest when told. This update includes a workaround.</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="up-act">
+      <button class="btn-primary" id="bInstall">Install Now</button>
+      <button class="btn-text" id="bLater">Remind Me Tomorrow</button>
+      <p class="up-sound">🔊 Sound on for this one</p>
+    </div>
+  </section>
+
+  <!-- ============ installing ============ -->
+  <section id="s-install" class="screen">
+    <div class="ins">
+      <svg class="logo"><use href="#logoS"/></svg>
+      <div class="bar"><i id="insBar"></i></div>
+      <p id="insMsg">Preparing update…</p>
+      <p id="insEta"></p>
+    </div>
+  </section>
+
+  <!-- ============ lock screen ============ -->
+  <section id="s-lock" class="screen">
+    <div class="lk-lock">🔒</div>
+    <div class="lk-date" id="lkDate"></div>
+    <div class="lk-time" id="lkTime">9:41</div>
+    <div class="lk-wid"><span class="wpill">🏃‍♀️ 14 km</span><span class="wpill">🩹 healing</span><span class="wpill">🍫 3%</span></div>
+    <div class="lk-notifs" id="lkNotifs"></div>
+    <div class="np">
+      <div class="art">🎧</div>
+      <div class="tx"><b>lo-fi beats to heal to</b><span>JessOS Radio</span></div>
+      <button data-music aria-label="Play or pause the music">❚❚</button>
+    </div>
+    <div class="lk-hint hide" id="lkHint">Swipe up (with the good hand) ✋</div>
+    <i class="homebar"></i>
+  </section>
+
+  <!-- ============ home screen ============ -->
+  <section id="s-home" class="screen">
+    <div class="wx" style="--i:0" data-toast="Forecast: 100% chance you handle it anyway ☀️">
+      <div class="wx-l"><b>Your week</b><span class="wx-big">14 km</span></div>
+      <div class="wx-r"><span class="wx-ic">⛅</span><span>Busy, with spells<br>of brilliance</span><span class="wx-hl">H: New role · L: Sleep</span></div>
+      <div class="wx-f">Feels like: jessness</div>
+    </div>
+    <div class="grid">
+      <button class="ic" data-app="msg" style="--i:1"><span class="ico" style="--bg:linear-gradient(160deg,#6ff29a,#1fc257)">💬</span><span class="lbl">Team Body</span><span class="badge">27</span></button>
+      <button class="ic" data-app="health" style="--i:2"><span class="ico" style="--bg:#fff">❤️</span><span class="lbl">Health</span><span class="badge">1</span></button>
+      <button class="ic" data-app="pep" style="--i:3"><span class="ico" style="--bg:linear-gradient(160deg,#ff6b6b,#c81d2e)">🍫</span><span class="lbl">Pepero</span><span class="badge">1</span></button>
+      <button class="ic" data-app="stride" style="--i:4"><span class="ico" style="--bg:linear-gradient(160deg,#ff9a4d,#fc5200)">🏃‍♀️</span><span class="lbl">Stride</span><span class="badge">2</span></button>
+      <button class="ic" data-app="split" style="--i:5"><span class="ico" style="--bg:linear-gradient(160deg,#4fe6bf,#0f9c7a)">⚖️</span><span class="lbl">SplitLoad</span><span class="badge">1</span></button>
+      <button class="ic" data-app="notes" style="--i:6"><span class="ico" style="--bg:linear-gradient(#ffd94a 0 28%,#fffdf3 28%)">📝</span><span class="lbl">Notes</span><span class="badge">1</span></button>
+      <button class="ic noisy always" data-app="excel" style="--i:7"><span class="ico" style="--bg:linear-gradient(160deg,#33c481,#107c41)">📊</span><span class="lbl">Excel</span><span class="badge">63</span></button>
+      <button class="ic noisy always" data-app="cal" style="--i:8"><span class="ico cal" style="--bg:#fff"><small id="calDay">MON</small><b id="calDate">23</b></span><span class="lbl">Calendar</span><span class="badge">6</span></button>
+      <button class="ic" data-app="cam" style="--i:9"><span class="ico" style="--bg:linear-gradient(160deg,#e5e5ea,#8e8e93)">📷</span><span class="lbl">Camera</span></button>
+      <button class="ic" data-app="photos" style="--i:10"><span class="ico" style="--bg:#fff">🌸</span><span class="lbl">Photos</span></button>
+      <button class="ic" data-app="settings" style="--i:11"><span class="ico" style="--bg:linear-gradient(160deg,#aeaeb2,#636366)">⚙️</span><span class="lbl">Settings</span></button>
+      <button class="ic" data-app="calc" style="--i:12"><span class="ico" style="--bg:linear-gradient(160deg,#48484a,#1c1c1e)">🧮</span><span class="lbl">Calculator</span></button>
+    </div>
+    <div class="batw" style="--i:13" data-toast="Running Buddy is fully charged and on standby 🔋">
+      <div><span class="br" style="--p:71;--c:#bf5af2">🧠</span><b>71%</b></div>
+      <div><span class="br" id="bwHand" style="--p:72;--c:#ff9f0a">🤚</span><b id="bwHandT">72%</b></div>
+      <div><span class="br" id="bwPep" style="--p:3;--c:#ff453a">🍫</span><b id="bwPepT">3%</b></div>
+      <div><span class="br" style="--p:100;--c:#30d158">🏃‍♂️</span><b>100%</b></div>
+    </div>
+    <div class="hint" id="hint">Tap the bouncing app 👆</div>
+    <div class="dock" style="--i:13">
+      <button class="ic" data-app="phone"><span class="ico" style="--bg:linear-gradient(160deg,#6ff29a,#1fc257)">📞</span><span class="lbl">Phone</span></button>
+      <button class="ic noisy always" data-app="mail"><span class="ico" style="--bg:linear-gradient(160deg,#5ac8fa,#0a6cff)">✉️</span><span class="lbl">Mail</span><span class="badge">999+</span></button>
+      <button class="ic" data-app="safari"><span class="ico" style="--bg:#fff">🧭</span><span class="lbl">Safari</span></button>
+      <button class="ic" data-app="music"><span class="ico" style="--bg:linear-gradient(160deg,#ff6b88,#fa2d48)">🎵</span><span class="lbl">Music</span></button>
+    </div>
+  </section>
+
+  <!-- ============ app: Team Body (group chat) ============ -->
+  <section class="app" id="a-msg" data-sb="dark">
+    <header class="app-hd">
+      <button class="back" data-close>‹ Home</button>
+      <div class="gav"><span>🤚</span><span>🦵</span><span>🧠</span></div>
+      <div class="ttl"><b>Team Body 🫶</b><small id="msgSub">8 members</small></div>
+    </header>
+    <div class="ff off" id="msgFF">Tap anywhere to speed up ⏩</div>
+    <div class="chat" id="chat"></div>
+    <div class="compose">
+      <div class="qr" id="qr"></div>
+      <div class="inp"><span>iMessage</span><i>↑</i></div>
+    </div>
+    <div class="donebar"><button data-close>Back to home</button></div>
+  </section>
+
+  <!-- ============ app: Health ============ -->
+  <section class="app" id="a-health" data-sb="dark">
+    <header class="app-hd"><button class="back" data-close>‹ Home</button><span class="hd-t">Health</span></header>
+    <div class="app-bd" id="hBd">
+      <div class="h-title"><div><h1>Summary</h1><p id="hDay">Recovery mode</p></div><img src="media/face.jpg" alt=""></div>
+
+      <div class="hc" style="--c:#ff9f0a">
+        <div class="hh">🤚 Hand &amp; fingers <span>Healing</span></div>
+        <div class="mv">
+          <svg class="ring" viewBox="0 0 62 62"><circle class="bg" cx="31" cy="31" r="26"/><circle class="fg" id="ringFg" cx="31" cy="31" r="26"/></svg>
+          <div class="big"><span data-count="72" id="healPct">0</span><small>% healed</small></div>
+        </div>
+        <p class="nt2">Recovering faster than expected. Very brave about it.</p>
+      </div>
+
+      <div class="hc" style="--c:#ff6b9a" data-toast="Palm says thanks for asking 🎈">
+        <div class="hh">🫴 Palm swelling <span>Going down</span></div>
+        <div class="mv">
+          <div class="big sm">Puffy → less puffy</div>
+          <svg class="spark" viewBox="0 0 112 42"><path d="M4 6C22 5 30 13 44 18S70 30 84 33 102 37 108 38"/></svg>
+        </div>
+        <p class="nt2">The only chart you want going down. 📉</p>
+      </div>
+
+      <div class="hc" style="--c:#30b0c7" data-toast="Complaint #4 received. Management says: noted 🙂">
+        <div class="hh">🦵 Knee <span>Grumpy</span></div>
+        <div class="mv"><div class="big"><span data-count="3">0</span><small>complaints filed</small></div><div class="big muted">0<small>resolved</small></div></div>
+        <p class="nt2">Currently under review by management.</p>
+      </div>
+
+      <div class="hc" style="--c:#28b463">
+        <div class="hh">🏃‍♀️ Legs <span>Smug</span></div>
+        <div class="mv"><div class="big"><span data-count="14">0</span><small>km this weekend</small></div></div>
+        <p class="nt2">4K on Saturday, 10K on Sunday. Refusing to elaborate.</p>
+      </div>
+
+      <div class="hc" style="--c:#bf5af2">
+        <div class="hh">🧠 Brain <span>New role loading</span></div>
+        <div class="mv"><div class="pbar" style="--w:71%"><i></i></div><div class="big sm"><span data-count="71">0</span>%</div></div>
+        <p class="nt2">Please don't close any tabs. Especially not the 63 in Excel.</p>
+      </div>
+
+      <div class="hc" style="--c:#ff453a" data-toast="Diagnosis: too big. Prognosis: excellent.">
+        <div class="hh">❤️ Heart <span>Checked today</span></div>
+        <div class="mv"><div class="big">Excellent</div></div>
+        <p class="nt2">Slightly too big for its own good. No treatment needed.</p>
+      </div>
+
+      <div class="hc" style="--c:#a0683c">
+        <div class="hh">🐴 Riding <span>Paused</span></div>
+        <div class="mv"><div class="big sm">Reins: on hold</div></div>
+        <p class="nt2">Until the hand heals. The horses have been informed.</p>
+      </div>
+
+      <div class="hc" style="--c:#e0313f">
+        <div class="hh">🍫 Pepero level <span>Critically low</span></div>
+        <div class="mv"><div class="big red"><span data-count="3">0</span>%</div></div>
+        <div class="pepbar"><i></i></div>
+        <p class="nt2">Refill strongly recommended.</p>
+      </div>
+
+      <div class="hc rx-card">
+        <div class="rx-top"><span class="rx-sym">℞</span><div><b>Dr. Pepero, MBBS</b><small>Master of Biscuit-Based Snacking</small></div></div>
+        <ol class="rx-list">
+          <li><b>Pepero</b><span>1 stick every 4 hours. More if it's a Monday.</span></li>
+          <li><b>Hand</b><span>Rest it. Properly. Not “rest it while typing”.</span></li>
+          <li><b>Overthinking</b><span>0 mg.</span></li>
+          <li><b>Sleep</b><span>As much as legally possible.</span></li>
+          <li><b>Next run</b><span>When Knee signs off.</span></li>
+        </ol>
+        <div class="rx-sign"><span class="sig-h">Dr. P.</span><span class="stamp">APPROVED</span></div>
+      </div>
+      <p class="real">Real note: keep it clean, keep it covered, and please see a doctor if it gets worse 💛</p>
+      <button class="cta" id="hCta">Order a Pepero refill 🍫</button>
+    </div>
+    <div class="more" id="hMore">Scroll ↓</div>
+  </section>
+
+  <!-- ============ app: Pepero Express ============ -->
+  <section class="app" id="a-pep" data-sb="light">
+    <header class="app-hd"><button class="back" data-close>‹ Home</button><div class="pp-brand">🍫 Pepero Express<small>Order #1111 · because the sticks look like 1s</small></div></header>
+    <div class="app-bd" id="pepBd">
+      <div id="pepCart">
+        <div class="pp-hero"><b>Emergency refill</b><span>for one very brave hand</span></div>
+        <div class="card">
+          <div class="item"><span class="e">🍫</span><div><b>Original Pepero</b><span>the classic</span></div><em>× lots</em></div>
+          <div class="item"><span class="e">🥜</span><div><b>Almond Pepero</b><span>crunchy, like your weekend</span></div><em>× lots</em></div>
+          <div class="item"><span class="e">🤍</span><div><b>White Cookie Pepero</b><span>for emergencies within emergencies</span></div><em>× lots</em></div>
+          <div class="item"><span class="e">🧻</span><div><b>Napkins</b><span>crumbs happen</span></div><em>× 1</em></div>
+        </div>
+        <div class="pnote">📝 Note for the rider: Please don't let her carry the bag. Her hand is on leave.</div>
+        <div class="card tot"><div>Total<small>already paid, don't even try</small></div><b>₹0</b></div>
+        <button class="cta" id="pepOrder">Place order 🍫</button>
+      </div>
+
+      <div id="pepTrack" class="hide">
+        <div class="map">
+          <svg viewBox="0 0 320 190" preserveAspectRatio="xMidYMid slice">
+            <rect width="320" height="190" fill="#f3ede3"/>
+            <rect x="184" y="56" width="64" height="52" rx="9" fill="#cfe8c4"/>
+            <rect x="84" y="134" width="72" height="26" rx="6" fill="#e9dfd1"/>
+            <rect x="184" y="134" width="22" height="26" rx="5" fill="#e9dfd1"/>
+            <rect x="8" y="54" width="50" height="54" rx="7" fill="#e9dfd1"/>
+            <path d="M0 40H320M0 120H320M0 170H320M70 0V190M170 0V190M260 0V190" stroke="#fff" stroke-width="13"/>
+            <path d="M0 80H70M215 120V190M260 80H320" stroke="#fff" stroke-width="7"/>
+            <path id="pepRoute" d="M30 170H70V120H170V40H250" fill="none" stroke="#e0313f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1 9" opacity=".7"/>
+            <path id="pepDoneP" d="M30 170H70V120H170V40H250" fill="none" stroke="#e0313f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="18" y="162" font-size="20">🏪</text>
+            <text x="268" y="49" font-size="24">🏠</text>
+            <text x="178" y="114" font-size="13">🚦</text>
+            <g id="pepRunner" transform="translate(30 170)"><text y="-5" font-size="24" text-anchor="middle" transform="scale(-1 1)">🏃‍♂️</text></g>
+          </svg>
+          <div class="eta" id="pepEta">Arriving in 0:09</div>
+        </div>
+        <div class="card rider"><span class="av">🏃‍♂️</span><div><b>Running Buddy</b><span>Delivery partner · on foot, already warmed up</span></div><em>★ 5.0</em></div>
+        <p class="status" id="pepStatus">Order confirmed!</p>
+        <ul class="tl" id="pepTl"><li>Order placed</li><li>Packed with care</li><li>Out for delivery</li><li>Delivered</li></ul>
+      </div>
+
+      <div id="pepDone" class="hide">
+        <p class="pp-d">Delivered! 🎉</p>
+        <button class="box" id="pepBox" aria-label="Open the box"><span class="inside"><i></i><i class="alm"></i><i></i><i class="wht"></i><i></i><i class="alm"></i></span><span class="lid"><span class="bow"></span></span><span class="base"><span>PEPERO</span></span></button>
+        <p class="tapme" id="pepTap">Tap the box to open 👆</p>
+        <div id="pepAfter" class="hide">
+          <p class="pp-ok">Pepero levels restored: 100% 🔋</p>
+          <button class="vcard" data-v="pepero"><img src="media/pepero.jpg" alt=""><span class="pl">▶</span><span class="cap">Proof of delivery · 0:10</span></button>
+          <p class="pp-rate">Rider rating: ★★★★★<small>(pre-filled, you're welcome)</small></p>
+        </div>
+      </div>
+    </div>
+    <div class="donebar"><button data-close>Back to home</button></div>
+  </section>
+
+  <!-- ============ app: Stride ============ -->
+  <section class="app" id="a-stride" data-sb="dark">
+    <header class="app-hd"><button class="back" data-close>‹ Home</button><span class="st-logo">STRIDE</span></header>
+    <div class="app-bd" id="stBd">
+      <div class="ath"><img src="media/face.jpg" alt=""><div><b>Jess</b><span>Sunday · Morning Run</span></div><em>🔥 Hard Mode</em></div>
+      <h2 class="st-title">Sunday Morning Run</h2>
+      <p class="st-desc">10K with one hand on medical leave. Normal stuff.</p>
+      <div class="stats">
+        <div>Distance<b><span id="stKm">0.00</span> km</b></div>
+        <div>Pace<b>unbothered</b></div>
+        <div>Elevation<b>emotional</b></div>
+      </div>
+      <div class="route" id="stRoute">
+        <svg viewBox="0 0 340 180" preserveAspectRatio="xMidYMid slice">
+          <rect width="340" height="180" fill="#eef1f4"/>
+          <path d="M0 66C80 50 120 92 200 72S300 42 340 54" stroke="#cfe3f7" stroke-width="16" fill="none"/>
+          <rect x="214" y="100" width="86" height="54" rx="12" fill="#d9eccf"/>
+          <path d="M0 122H340M112 0V180M252 0V180M0 22H340" stroke="#fff" stroke-width="8"/>
+          <path class="rt" id="stPath" d="M30 150C60 150 70 120 100 112S150 118 172 96 196 40 236 38 312 52 306 92 262 140 222 132 168 150 140 146 70 162 30 150"/>
+          <circle cx="30" cy="150" r="7" fill="#30d158" stroke="#fff" stroke-width="3"/>
+          <text x="328" y="172" font-size="11" font-weight="700" fill="#8e8e93" text-anchor="end" font-family="-apple-system, sans-serif">10.00 km</text>
+        </svg>
+      </div>
+      <div class="wk">This weekend: <b>2 runs · 14 km · 1 bandaged hand</b></div>
+      <h3 class="st-h">Highlight reel</h3>
+      <button class="vcard" data-v="run10k"><img src="media/run10k.jpg" alt=""><span class="pl">▶</span><span class="cap">10K, with commentary · 0:11</span></button>
+      <h3 class="st-h">Post-run photo</h3>
+      <div class="photo"><img src="media/starfish.jpg" alt="Post-run cooldown"></div>
+      <p class="photo-cap">Post-run cooldown, as recommended by Knee.</p>
+      <h3 class="st-h">Achievements</h3>
+      <div class="badges" id="stBadges">
+        <div class="bdg"><span class="c">🔁</span><b>Back-to-back</b><span>4K Saturday, 10K Sunday</span></div>
+        <div class="bdg"><span class="c">🔥</span><b>Hard Mode</b><span>ran with a burnt hand</span></div>
+        <div class="bdg"><span class="c">😌</span><b>Effortless</b><span>(allegedly)</span></div>
+      </div>
+      <div class="kudos">
+        <p class="kd-h">👍 <b>Running Buddy</b> gave kudos</p>
+        <div class="cmt"><span class="av">🏃‍♂️</span><div><b>Running Buddy</b><p>10 km beside you. Best seat in the house.</p></div></div>
+      </div>
+      <button class="btn-st" id="stKudos">Give yourself kudos 👍</button>
+      <p class="kd-msg" id="stMsg">Kudos received. From you, to you. Long overdue.</p>
+    </div>
+    <div class="more" id="stMore">Scroll ↓</div>
+    <div class="donebar"><button data-close>Back to home</button></div>
+  </section>
+
+  <!-- ============ app: SplitLoad ============ -->
+  <section class="app" id="a-split" data-sb="dark">
+    <header class="app-hd"><button class="back" data-close>‹ Home</button><div class="sl-logo">⚖️ SplitLoad<small>You &amp; Running Buddy</small></div></header>
+    <div class="app-bd" id="slBd">
+      <button class="vrow" data-v="monday"><span class="th"><img src="media/monday.jpg" alt=""><span class="pl sm">▶</span></span><span><b>Live from your Monday</b><small>0:11 · watch this first</small></span></button>
+      <p class="sl-intro">This week's load is a little uneven. <b>Tap anything on your plate</b> to send it his way.</p>
+      <div class="bal"><i id="balMe"></i><u id="balHim"></u></div>
+      <div class="bal-l"><span>You</span><span>Running Buddy</span></div>
+      <div class="reply" id="slReply"></div>
+      <div class="plate"><h3>Your plate <span id="cMe">12</span></h3><div class="chips" id="myChips"></div></div>
+      <div class="plate his"><h3>His plate <span id="cHim">0</span></h3><div class="chips" id="hisChips"><span class="empty" id="hisEmpty">Empty. Suspiciously empty.</span></div></div>
+      <div id="slSettle"></div>
+    </div>
+    <div class="donebar"><button data-close>Back to home</button></div>
+  </section>
+
+  <!-- ============ app: Notes ============ -->
+  <section class="app" id="a-notes" data-sb="dark">
+    <header class="app-hd"><button class="back" data-close>‹ Notes</button><span class="nt-ic">⋯</span></header>
+    <div class="app-bd" id="ntBd">
+      <p class="nt-meta">Shared by 🏃‍♂️ Running Buddy · Edited Sunday, after 10 km</p>
+      <h1 class="nt-title"><span id="ntT"></span><i class="caret"></i></h1>
+      <div class="note-body" id="ntBody">
+        <div class="blk"><p class="def">jessness <span class="ipa">(n.) /ˈjes·nəs/</span></p></div>
+        <div class="blk"><p>What it feels like to be around you. No existing word was doing the job, so I made one.</p></div>
+        <div class="blk"><p>Side effects may include:</p><ul><li>time running suspiciously fast</li><li>laughing at things that aren't even that funny</li><li>leaving lighter than I arrived</li></ul></div>
+        <div class="blk"><p>Dose last week: 5 times. Plus 10 km on Sunday, which I'm counting as a personal record.</p></div>
+        <div class="blk"><hr></div>
+        <div class="blk"><p>Also, for the record:</p></div>
+        <div class="blk"><p>A burnt hand. A swollen palm. A knee with opinions. A new role. A whole new project. And you still ran 14 km, and you're still showing up for all of it.</p></div>
+        <div class="blk"><p class="kill"><b>You're not just getting through it. You're killing it.</b></p></div>
+        <div class="blk"><p>And you're not doing any of it alone.</p></div>
+      </div>
+    </div>
+    <div class="donebar"><button data-close>Back to home</button></div>
+  </section>
+
+  <!-- ============ Control Center ============ -->
+  <div id="cc">
+    <p class="cc-hint" id="ccHint">Tap <b>Rest Focus</b> 🌙</p>
+    <div class="cc-grid">
+      <div class="tile conn"><i>✈️</i><i class="on2">📶</i><i class="on">🌐</i><i class="on">🎧</i></div>
+      <div class="tile np2"><b>lo-fi beats to heal to</b><button data-music aria-label="Play or pause the music">❚❚</button></div>
+      <button class="focus-t" id="focusTile"><span class="m">🌙</span><span><b>Rest Focus</b><span id="focusSt">Off</span></span></button>
+      <div class="tile sliders"><div class="sld"><i style="height:62%"></i><span>☀️</span></div><div class="sld"><i style="height:45%"></i><span>🔊</span></div></div>
+      <div class="tile mini"><i>🔦</i><i>⏱️</i><i>🧮</i><i>📷</i></div>
+    </div>
+    <div class="cc-note" id="ccNote">Rest Focus is on.<br><b>Silenced:</b> work, deadlines and overthinking.<br><b>Allowed:</b> Pepero, sleep, Bridgerton and your people.</div>
+  </div>
+
+  <!-- ============ the call ============ -->
+  <section id="s-call" class="screen">
+    <p class="cl-lbl" id="clLbl">incoming call</p>
+    <div class="cl-av">🏃‍♂️</div>
+    <p class="cl-name">Running Buddy</p>
+    <p class="cl-sub" id="clSub">allowed during Rest Focus 🌙</p>
+    <div class="cl-mid">
+      <div class="wave" id="wave"><i style="--d:.1"></i><i style="--d:.5"></i><i style="--d:.25"></i><i style="--d:.65"></i><i style="--d:.05"></i><i style="--d:.4"></i><i style="--d:.6"></i><i style="--d:.2"></i><i style="--d:.45"></i></div>
+      <div class="vn"><span>▶</span><div class="pbar2"><i id="vnBar"></i></div><span id="vnT">0:00</span></div>
+      <p class="cap-box" id="cap"></p>
+      <p class="cap-tap hide" id="capTap">tap to continue</p>
+    </div>
+    <div class="cl-btns ring-btns">
+      <button class="cbtn dec" id="bDecline"><i><svg><use href="#phoneS"/></svg></i>Decline</button>
+      <button class="cbtn acc" id="bAccept"><i><svg><use href="#phoneS"/></svg></i>Accept</button>
+    </div>
+    <div class="cl-btns hang-btns">
+      <button class="cbtn dec" id="bHang"><i><svg><use href="#phoneS"/></svg></i><span id="hangLbl">End</span></button>
+    </div>
+  </section>
+
+  <!-- ============ installed ============ -->
+  <section id="s-end" class="screen">
+    <div class="chk"><svg viewBox="0 0 50 50"><path d="M13 26l8 8 16-17" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h2 class="end-t">JessOS 26.11 installed</h2>
+    <p class="end-s">Weekend: recovered. Mostly.</p>
+    <div class="end-chips">
+      <div style="--i:0">🩹 Healing<b>in progress</b></div>
+      <div style="--i:1">🍫 Pepero<b>100%</b></div>
+      <div style="--i:2">⚖️ Plate<b>split</b></div>
+      <div style="--i:3">🏃‍♂️ Running Buddy<b>on call</b></div>
+    </div>
+    <div class="end-btns">
+      <button class="btn-end" id="endShare">Send him a 🍫</button>
+      <button class="btn-ghost" id="endAgain">↺ Start over</button>
+    </div>
+    <p class="end-f">Built for exactly one user.</p>
+  </section>
+
+  <!-- ============ video player + toast ============ -->
+  <div id="player">
+    <button class="pl-x" id="plX" aria-label="Close">✕</button>
+    <div class="pl-box">
+      <video id="vid" playsinline webkit-playsinline preload="none"></video>
+      <div class="pl-end" id="plEnd"><button id="plAgain">↺ Watch again</button><button id="plDone">Done</button></div>
+      <button class="pl-tap" id="plTap">▶ Tap to play</button>
+    </div>
+  </div>
+  <div id="toast"></div>
+
+  <div id="escape" hidden>
+    <div class="ebox">
+      <svg class="logo"><use href="#logoS"/></svg>
+      <p class="e1">One moment</p>
+      <p class="e2">JessOS installs best in <span id="eWhere">your browser</span>, with sound on.</p>
+      <a class="ebtn" id="eOut" href="#">Open in browser ›</a>
+      <p class="e3" id="eIos">If nothing happens, tap <b>•••</b> at the top right, then <b>Open in external browser</b>.</p>
+      <button id="eStay" type="button">Continue here instead</button>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  "use strict";
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const until = (cond) => new Promise((r) => { const f = () => (cond() ? r() : setTimeout(f, 150)); f(); });
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const Q = location.search;
+  const MUTE = /[?&]mute\b/.test(Q);
+  const phone = $("#phone"), sb = $("#sb");
+  function el(tag, cls, html){
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  /* a wait that a tap on `node` cuts short (ignores the tap that started it) */
+  function makePauser(node){
+    let skip = null, since = 0;
+    node.addEventListener("click", () => { if (skip && performance.now() - since > 80) skip(); });
+    return (ms) => new Promise((res) => {
+      since = performance.now();
+      const t = setTimeout(done, ms);
+      function done(){ clearTimeout(t); skip = null; res(); }
+      skip = done;
+    });
+  }
+
+  /* ============================================================ in-app browsers → the real browser */
+  const UA = navigator.userAgent, ANDROID = /Android/i.test(UA);
+  const IN_APP = /Instagram|FBAN|FBAV|FB_IAB|Line\/|Snapchat|Twitter/i.test(UA) && !/[?&]stay\b/.test(Q);
+  if (IN_APP){
+    const here = location.host + location.pathname, out = $("#eOut");
+    out.href = ANDROID
+      ? `intent://${here}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(`https://${here}?stay`)};end`
+      : `x-safari-https://${here}`;
+    out.textContent = ANDROID ? "Open in Chrome ›" : "Open in Safari ›";
+    $("#eWhere").textContent = ANDROID ? "Chrome" : "Safari";
+    $("#eIos").hidden = ANDROID;
+    $("#escape").hidden = false;
+    $("#eStay").addEventListener("click", () => { $("#escape").hidden = true; prepMusic(); });
+    setTimeout(() => out.click(), 250);
+  }
+
+  /* ============================================================ clock, dates, status bar */
+  const hm = (d) => `${d.getHours() % 12 || 12}:${String(d.getMinutes()).padStart(2, "0")}`;
+  function clock(){
+    const d = new Date();
+    $("#sbTime").textContent = hm(d);
+    $("#lkTime").textContent = hm(d);
+    $("#lkDate").textContent = d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+  }
+  clock(); setInterval(clock, 15000);
+  const D0 = new Date();
+  $("#calDay").textContent = D0.toLocaleDateString("en-GB", { weekday: "short" }).toUpperCase();
+  $("#calDate").textContent = D0.getDate();
+  const DAY = Math.max(1, Math.floor((D0 - new Date(2026, 10, 20)) / 864e5) + 1);
+  const HEAL = Math.min(96, 48 + DAY * 6);
+  $("#hDay").textContent = `Recovery mode · Day ${DAY}`;
+  $("#healPct").dataset.count = HEAL;
+  $("#bwHand").style.setProperty("--p", HEAL);
+  $("#bwHandT").textContent = `${HEAL}%`;
+
+  sb.classList.add("on");
+  const sbMode = (dark) => sb.classList.toggle("dark", !!dark);
+  function battery(p){
+    const cell = $("#battCell"), v = Math.round(p);
+    cell.style.setProperty("--lvl", p / 100);
+    cell.style.setProperty("--bc", p < 20 ? "#ff453a" : p < 50 ? "#ffd60a" : "#30d158");
+    $("#battTxt").textContent = `🍫 ${v}%`;
+    $("#battTxt").classList.toggle("low", p < 20);
+    $$(".wpill")[2].textContent = `🍫 ${v}%`;
+    const bw = $("#bwPep");
+    bw.style.setProperty("--p", v);
+    bw.style.setProperty("--c", p < 20 ? "#ff453a" : p < 50 ? "#ffd60a" : "#30d158");
+    $("#bwPepT").textContent = `${v}%`;
+  }
+  battery(3);
+
+  function show(id){ $$(".screen").forEach((s) => s.classList.toggle("on", s.id === id)); }
+
+  let toastT = 0;
+  function toast(msg, ms = 2700){
+    const t = $("#toast");
+    t.textContent = msg; t.classList.add("on");
+    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), ms);
+  }
+  function countUp(node, to, ms = 1400, fmt = (v) => Math.round(v)){
+    const t0 = performance.now();
+    const step = () => {
+      const k = Math.min(1, (performance.now() - t0) / ms), e = 1 - Math.pow(1 - k, 3);
+      node.textContent = fmt(to * e);
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+    setTimeout(() => (node.textContent = fmt(to)), ms + 150);
+  }
+
+  /* ============================================================ music: original lo-fi, rendered once to a WAV */
+  const NOTE = (n) => {
+    const m = /^([A-G])(#?)(\d)$/.exec(n);
+    const st = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[m[1]] + (m[2] ? 1 : 0);
+    return 440 * Math.pow(2, (12 * (+m[3] + 1) + st - 69) / 12);
+  };
+  const BEAT = .75, BAR = 4 * BEAT, BARS = 16;
+  const CHORDS = [["F2", "A3 C4 E4 G4"], ["E2", "G3 B3 D4 A4"], ["D2", "F3 A3 C4 E4"], ["C2", "E3 G3 B3 D4"]];
+  const MELO = [
+    "E5:1.5 D5:.5 C5:1 A4:1", "G4:3 -:1", "A4:1 C5:1 D5:1.5 E5:.5", "D5:2 -:2",
+    "E5:1 G5:1 E5:1 D5:1", "D5:1.5 C5:.5 D5:2", "-:1 A4:1 C5:1 D5:1", "E5:3 -:1",
+    "A5:1.5 G5:.5 E5:1 D5:1", "G5:1.5 E5:.5 D5:2", "C5:1 D5:1 E5:1 G5:1", "E5:2 D5:1 C5:1",
+  ];
+  function wav(d, sr, k){
+    const n = d.length, b = new ArrayBuffer(44 + n * 2), v = new DataView(b);
+    const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+    w(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); w(8, "WAVE"); w(12, "fmt ");
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, sr, true);
+    v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, "data"); v.setUint32(40, n * 2, true);
+    for (let i = 0; i < n; i++) v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, d[i] * k)) * 32767, true);
+    return new Blob([b], { type: "audio/wav" });
+  }
+  function impulse(c, sec){
+    const n = Math.floor(c.sampleRate * sec), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
+    let lp = 0;
+    for (let i = 0; i < n; i++){ lp = lp * .6 + (Math.random() * 2 - 1) * .4; d[i] = lp * Math.pow(1 - i / n, 2.8); }
+    return b;
+  }
+  function ep(c, out, f, t, dur, v){
+    const car = c.createOscillator(), mod = c.createOscillator(), mg = c.createGain(), g = c.createGain();
+    car.frequency.value = f; car.detune.value = rnd(-7, 7); mod.frequency.value = f;
+    mg.gain.setValueAtTime(f * .9, t); mg.gain.exponentialRampToValueAtTime(f * .05, t + .7);
+    mod.connect(mg); mg.connect(car.frequency);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .012);
+    g.gain.exponentialRampToValueAtTime(v * .4, t + .5); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    car.connect(g); g.connect(out);
+    car.start(t); mod.start(t); car.stop(t + dur + .02); mod.stop(t + dur + .02);
+  }
+  function bass(c, out, f, t, dur, v){
+    [[1, "triangle", v], [2, "sine", v * .6]].forEach(([m, type, vol]) => {
+      const o = c.createOscillator(), lp = c.createBiquadFilter(), g = c.createGain();
+      o.type = type; o.frequency.value = f * m; lp.type = "lowpass"; lp.frequency.value = 420;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .02);
+      g.gain.setValueAtTime(vol * .8, t + dur * .6); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+      o.connect(lp); lp.connect(g); g.connect(out); o.start(t); o.stop(t + dur + .02);
+    });
+  }
+  function kick(c, out, t, v){
+    const o = c.createOscillator(), g = c.createGain();
+    o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(52, t + .1);
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + .3);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t + .34);
+  }
+  function hit(c, out, nb, t, type, f, dur, v){
+    const s = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = nb; fl.type = type; fl.frequency.value = f; fl.Q.value = .8;
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    s.connect(fl); fl.connect(g); g.connect(out); s.start(t, rnd(0, 1.5)); s.stop(t + dur + .02);
+  }
+  function snare(c, out, nb, t, v){
+    hit(c, out, nb, t, "bandpass", 1700, .2, v);
+    const o = c.createOscillator(), g = c.createGain();
+    o.frequency.setValueAtTime(200, t); o.frequency.exponentialRampToValueAtTime(140, t + .08);
+    g.gain.setValueAtTime(v * .6, t); g.gain.exponentialRampToValueAtTime(.0001, t + .1);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t + .12);
+  }
+  function bellV(c, out, f, t, v){
+    [[1, 1, 1.6], [4, .16, .22], [2.01, .1, .7]].forEach(([m, a, d]) => {
+      const o = c.createOscillator(), g = c.createGain();
+      o.frequency.value = f * m;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v * a, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+      o.connect(g); g.connect(out); o.start(t); o.stop(t + d + .02);
+    });
+  }
+  async function renderMusic(){
+    const C = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    if (!C) return null;
+    const sr = 44100, L = BARS * BAR, c = new C(1, Math.ceil(sr * (L + 3)), sr);
+    const nb = c.createBuffer(1, sr * 2, sr), nd = nb.getChannelData(0);
+    for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+    const mix = c.createGain(), keys = c.createBiquadFilter(), drums = c.createBiquadFilter();
+    const dry = c.createGain(), wet = c.createGain(), rev = c.createConvolver();
+    keys.type = "lowpass"; keys.frequency.value = 3800; drums.type = "lowpass"; drums.frequency.value = 9000;
+    keys.connect(mix); drums.connect(mix);
+    dry.gain.value = .9; wet.gain.value = .3; rev.buffer = impulse(c, 2.4);
+    mix.connect(dry); mix.connect(rev); rev.connect(wet); dry.connect(c.destination); wet.connect(c.destination);
+    const S = BEAT / 4;
+    for (let b = 0; b < BARS; b++){
+      const t0 = b * BAR, [root, ch] = CHORDS[b % 4], R = NOTE(root), fs = ch.split(" ").map(NOTE);
+      fs.forEach((f, k) => { ep(c, keys, f, t0 + k * .018, BEAT * 2.4, .062); ep(c, keys, f, t0 + 2.5 * BEAT + k * .012, BEAT * 1.4, .04); });
+      bass(c, keys, R, t0, BEAT * 2.2, .15); bass(c, keys, R, t0 + 2.5 * BEAT, BEAT * 1.2, .11);
+      if (b >= 1){
+        [0, 7, 10].forEach((s) => kick(c, drums, t0 + s * S, .26));
+        [4, 12].forEach((s) => snare(c, drums, nb, t0 + s * S, .15));
+        for (let e = 0; e < 8; e++) hit(c, drums, nb, t0 + e * 2 * S + (e % 2 ? S * .35 : 0), "highpass", 7000, .045, e % 2 ? .035 : .05);
+      }
+      if (b >= 4){
+        let t = t0;
+        MELO[b - 4].split(" ").forEach((tok) => { const [n, d] = tok.split(":"); if (n !== "-") bellV(c, keys, NOTE(n), t, .12); t += +d * BEAT; });
+      }
+    }
+    for (let k = 0; k < 230; k++) hit(c, drums, nb, rnd(0, L), "highpass", rnd(1800, 4200), rnd(.004, .012), rnd(.02, .08));
+    const done = new Promise((res) => { c.oncomplete = (e) => res(e.renderedBuffer); });
+    const p = c.startRendering();
+    const buf = await (p && p.then ? p : done);
+    const d = buf.getChannelData(0), n = Math.round(L * sr), loop = new Float32Array(n);
+    loop.set(d.subarray(0, n));
+    for (let i = n; i < d.length; i++) loop[i - n] += d[i];
+    let peak = 0;
+    for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(loop[i]));
+    const k = peak ? 1 / peak : 1, sat = Math.tanh(2.2);
+    for (let i = 0; i < n; i++) loop[i] = Math.tanh(loop[i] * k * 2.2) / sat;
+    return wav(loop, sr, .5);
+  }
+
+  const music = new Audio();
+  music.loop = true; music.preload = "auto"; music.setAttribute("playsinline", "");
+  let musicReady = false, wantMusic = false;
+  const hold = new Set();
+  function prepMusic(){
+    if (MUTE || musicReady) return;
+    renderMusic().then((blob) => {
+      if (!blob) return;
+      music.src = URL.createObjectURL(blob);
+      musicReady = true;
+      syncMusic();
+    }).catch(() => {});
+  }
+  if (!IN_APP) prepMusic();
+  function syncMusic(){
+    if (wantMusic && musicReady && !hold.size && !document.hidden){
+      const p = music.play();
+      if (p && p.catch) p.catch(() => {});
+    } else music.pause();
+    $$("[data-music]").forEach((b) => (b.textContent = wantMusic ? "❚❚" : "▶"));
+  }
+  function playMusic(){ wantMusic = true; syncMusic(); }
+  function pauseMusic(){ wantMusic = false; syncMusic(); }
+  document.addEventListener("visibilitychange", syncMusic);
+  function audioStart(){
+    if (MUTE) return;
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
+    ac();
+    if (!musicReady){ music.src = URL.createObjectURL(wav(new Float32Array(4410), 44100, 1)); music.play().catch(() => {}); }
+    playMusic();
+  }
+
+  /* ============================================================ sound effects */
+  let AC = null, master = null, noiseBuf = null, ringT = 0, vBus = null;
+  function ac(){
+    if (MUTE) return null;
+    if (!AC){
+      const C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return null;
+      AC = new C(); master = AC.createGain(); master.gain.value = 1; master.connect(AC.destination);
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (AC.state === "suspended") AC.resume();
+    return AC;
+  }
+  function tone(f, t, dur, { type = "sine", vol = .1, att = .005, to = 0, out = master } = {}){
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + att); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t + dur + .05);
+  }
+  function noise(t, dur, { type = "bandpass", f = 1000, to = 0, q = 1, vol = .1, att = .01 } = {}){
+    const s = AC.createBufferSource(), fl = AC.createBiquadFilter(), g = AC.createGain();
+    s.buffer = noiseBuf; fl.type = type; fl.frequency.setValueAtTime(f, t);
+    if (to) fl.frequency.exponentialRampToValueAtTime(to, t + dur);
+    fl.Q.value = q;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + att); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    s.connect(fl); fl.connect(g); g.connect(master); s.start(t, Math.random()); s.stop(t + dur + .05);
+  }
+  const bell = (f, t, vol = .07) => [[1, 1, 1.4], [2.76, .35, .5], [5.4, .15, .25]].forEach(([m, a, d]) => tone(f * m, t, d, { vol: vol * a, att: .003 }));
+  const marimba = (f, t, v) => { tone(f, t, .45, { vol: v, att: .003 }); tone(f * 4, t, .08, { vol: v * .3, att: .002 }); tone(f * 10, t, .03, { vol: v * .1, att: .001 }); };
+  function blip(out, t, f, form){
+    const o = AC.createOscillator(), bp = AC.createBiquadFilter(), g = AC.createGain();
+    o.type = "sawtooth"; o.frequency.setValueAtTime(f * 1.08, t); o.frequency.exponentialRampToValueAtTime(f, t + .07);
+    bp.type = "bandpass"; bp.frequency.value = form; bp.Q.value = 3;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.16, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + .075);
+    o.connect(bp); bp.connect(g); g.connect(out); o.start(t); o.stop(t + .09);
+  }
+  const now = () => AC.currentTime;
+  const sfx = {
+    tap(){ if (ac()) tone(1700, now(), .03, { vol: .025 }); },
+    tick(){ if (ac()) tone(1500, now(), .05, { vol: .03 }); },
+    key(){ if (!ac()) return; const t = now(); noise(t, .025, { type: "highpass", f: 3500, vol: .05, att: .001 }); tone(rnd(1800, 2400), t, .02, { vol: .015 }); },
+    pop(){ if (ac()) tone(620, now(), .09, { vol: .07, to: 1250, att: .004 }); },
+    send(){ if (!ac()) return; const t = now(); noise(t, .22, { f: 900, to: 5000, q: 1.4, vol: .07, att: .02 }); tone(500, t + .02, .12, { vol: .035, to: 1300 }); },
+    ding(){ if (!ac()) return; const t = now(); bell(1318.5, t, .045); bell(1760, t + .1, .035); },
+    chime(i = 0){ if (!ac()) return; const t = now(), m = i % 2 ? 1.122 : 1; [783.99, 1046.5, 1318.5].forEach((f, k) => bell(f * m, t + k * .07, .03)); },
+    unlock(){ if (!ac()) return; const t = now(); noise(t, .04, { type: "highpass", f: 2500, vol: .09, att: .001 }); tone(900, t, .05, { type: "triangle", vol: .05 }); },
+    open(){ if (ac()) noise(now(), .22, { f: 500, to: 2200, q: .9, vol: .03, att: .05 }); },
+    close(){ if (ac()) noise(now(), .2, { f: 2200, to: 500, q: .9, vol: .028, att: .03 }); },
+    bonk(){ if (!ac()) return; const t = now(); tone(330, t, .16, { type: "triangle", vol: .16, to: 190 }); noise(t, .05, { type: "lowpass", f: 900, vol: .1, att: .001 }); },
+    swish(){ if (ac()) noise(now(), .28, { f: 700, to: 3800, q: 1.2, vol: .08, att: .05 }); },
+    step(){ if (ac()) noise(now(), .05, { type: "lowpass", f: 420, vol: .07, att: .002 }); },
+    crunch(){ if (!ac()) return; const t = now(); for (let k = 0; k < 7; k++) noise(t + k * .045 + rnd(0, .02), rnd(.02, .05), { f: rnd(1800, 3800), q: 1.5, vol: rnd(.08, .14), att: .002 }); },
+    success(){ if (!ac()) return; const t = now(); [523.25, 659.25, 783.99, 1046.5].forEach((f, k) => bell(f, t + k * .08, .035)); },
+    tada(){ if (!ac()) return; const t = now(); tone(523.25, t, .12, { type: "triangle", vol: .08 }); [659.25, 783.99, 1046.5].forEach((f) => tone(f, t + .14, .7, { type: "triangle", vol: .06 })); },
+    kaching(){ if (!ac()) return; const t = now(); noise(t, .06, { type: "lowpass", f: 600, vol: .1, att: .002 }); bell(2093, t + .06, .05); bell(2637, t + .12, .05); noise(t + .1, .35, { type: "highpass", f: 6000, vol: .03, att: .01 }); },
+    doorbell(){ if (!ac()) return; const t = now(); bell(659.25, t, .07); bell(523.25, t + .45, .07); },
+    alarm(){ if (!ac()) return; const t = now(); tone(880, t, .09, { type: "square", vol: .02 }); tone(880, t + .16, .09, { type: "square", vol: .02 }); },
+    boot(){ if (!ac()) return; const t = now(); [261.63, 392, 523.25, 659.25, 783.99].forEach((f, k) => tone(f, t + k * .05, 2.2, { vol: .035, att: .25 })); },
+    focus(){ if (!ac()) return; const t = now(); [1046.5, 783.99, 523.25].forEach((f, k) => bell(f, t + k * .14, .04)); tone(261.63, t, 1.4, { vol: .04, att: .3 }); },
+    connect(){ if (!ac()) return; const t = now(); tone(880, t, .08, { vol: .05 }); tone(1320, t + .1, .12, { vol: .05 }); },
+    hang(){ if (!ac()) return; const t = now(); tone(587.33, t, .16, { vol: .06 }); tone(440, t + .2, .22, { vol: .06 }); },
+    ring(on){
+      clearInterval(ringT);
+      if (!on || !ac()) return;
+      const RT = [659.25, 783.99, 987.77, 1174.66, 987.77, 783.99, 880, 1046.5];
+      const once = () => { const t = now() + .03; RT.forEach((f, k) => marimba(f, t + k * .14, .09)); };
+      once(); ringT = setInterval(once, 2300);
+    },
+    voice(text){
+      if (!ac()) return 0;
+      sfx.hush();
+      vBus = AC.createGain(); vBus.connect(master);
+      const t0 = now() + .03;
+      let t = t0;
+      text.split(/\s+/).forEach((w) => {
+        const n = Math.max(1, Math.round(w.replace(/[^a-z]/gi, "").length / 2.5));
+        for (let k = 0; k < n; k++){ blip(vBus, t, rnd(300, 390), rnd(1000, 2300)); t += .088; }
+        t += /[.,!?—…]$/.test(w) ? .2 : .035;
+      });
+      return t - t0;
+    },
+    hush(){
+      if (!vBus) return;
+      const g = vBus; vBus = null;
+      g.gain.setTargetAtTime(0, now(), .02);
+      setTimeout(() => g.disconnect(), 250);
+    },
+  };
+
+  /* ============================================================ video player */
+  const VDUR = { friday: "0:10", run10k: "0:11", monday: "0:11", pepero: "0:10" };
+  const vid = $("#vid"), player = $("#player");
+  let videoOpen = false;
+  function openVideo(name){
+    videoOpen = true;
+    hold.add("video"); syncMusic();
+    $("#plEnd").classList.remove("on"); $("#plTap").classList.remove("on");
+    vid.poster = `media/${name}.jpg`;
+    vid.src = `media/${name}.mp4`;
+    vid.muted = MUTE;
+    player.classList.add("on");
+    const p = vid.play();
+    if (p && p.catch) p.catch(() => $("#plTap").classList.add("on"));
+  }
+  function closeVideo(){
+    vid.pause();
+    player.classList.remove("on");
+    videoOpen = false;
+    hold.delete("video"); syncMusic();
+  }
+  vid.addEventListener("ended", () => $("#plEnd").classList.add("on"));
+  vid.addEventListener("error", () => { if (videoOpen) toast("That video didn't load. Try again in a moment?"); });
+  vid.addEventListener("click", () => { if (vid.paused) vid.play().catch(() => {}); else vid.pause(); });
+  $("#plTap").addEventListener("click", () => { $("#plTap").classList.remove("on"); vid.play().catch(() => {}); });
+  $("#plAgain").addEventListener("click", () => { $("#plEnd").classList.remove("on"); vid.currentTime = 0; vid.play().catch(() => {}); });
+  $("#plDone").addEventListener("click", closeVideo);
+  $("#plX").addEventListener("click", closeVideo);
+
+  document.addEventListener("click", (e) => {
+    const m = e.target.closest("[data-music]");
+    if (m){ wantMusic ? pauseMusic() : playMusic(); return; }
+    const v = e.target.closest("[data-v]");
+    if (v){ openVideo(v.dataset.v); return; }
+    const tt = e.target.closest("[data-toast]");
+    if (tt){ toast(tt.dataset.toast); sfx.tap(); }
+  });
+
+  /* ============================================================ software update → install */
+  let installing = false;
+  const insWait = makePauser($("#s-install"));
+  $("#bInstall").addEventListener("click", () => { audioStart(); sfx.tap(); startInstall(); });
+  $("#bLater").addEventListener("click", () => {
+    if (installing) return;
+    audioStart(); sfx.bonk();
+    toast("Nice try. Installing now 😌", 1800);
+    setTimeout(startInstall, 1500);
+  });
+  const STEPS = [
+    ["Preparing update…", 8, "Time remaining: about 3 Peperos"],
+    ["Wrapping everything in bubble wrap…", 24, "Time remaining: about 3 Peperos"],
+    ["Telling the to-do list to calm down…", 41, "Time remaining: about 2 Peperos"],
+    ["Downloading Pepero (this may take a while)…", 63, "Time remaining: about 2 Peperos"],
+    ["Installing a running buddy…", 82, "Time remaining: about 1 Pepero"],
+    ["Almost there. Drink some water.", 96, "Time remaining: 1 sip"],
+    ["Restarting…", 100, ""],
+  ];
+  async function startInstall(){
+    if (installing) return;
+    installing = true;
+    show("s-install"); sb.classList.remove("on");
+    await wait(500);
+    for (const [msg, pct, eta] of STEPS){
+      $("#insMsg").textContent = msg; $("#insEta").textContent = eta; $("#insBar").style.width = pct + "%";
+      sfx.tick();
+      await insWait(1500);
+    }
+    $("#s-install").classList.add("boot");
+    sfx.boot();
+    await wait(1900);
+    toLock();
+  }
+
+  /* ============================================================ lock screen */
+  const NOTIFS = [
+    ["Team Body", "#34c759", "💬", "Hand", "guys… quick update 🙃", "Fri"],
+    ["Pepero Express", "#d7263d", "🍫", "Low Pepero warning", "Levels look critically low. Shall we fix that?", "Sat"],
+    ["Stride", "#fc5200", "🏃‍♀️", "Weekend summary ready", "Prepare to be smug.", "Sun"],
+    ["SplitLoad", "#13a985", "⚖️", "Running Buddy", "wants to split your week with you", "9m ago"],
+    ["Notes", "#e0a100", "📝", "Shared note", "“jessness” was edited", "now"],
+  ];
+  const lock = $("#s-lock");
+  let unlocked = false, lockArmed = false, px = 0, py = 0;
+  async function toLock(){
+    show("s-lock"); sb.classList.add("on", "lock"); sbMode(false);
+    const box = $("#lkNotifs");
+    setTimeout(() => $("#lkHint").classList.remove("hide"), 2600);
+    for (const [app, c, ic, title, body, when] of NOTIFS){
+      await wait(850);
+      if (unlocked) return;
+      const n = el("div", "nt", `<span class="ai">${ic}</span><div class="tx"><div class="h">${app}<span>${when}</span></div><b>${title}</b><p>${body}</p></div>`);
+      n.style.setProperty("--c", c);
+      box.appendChild(n);
+      sfx.ding();
+    }
+  }
+  lock.addEventListener("pointerdown", (e) => {
+    if (e.target.closest("[data-music]")) return;
+    lockArmed = true; px = e.clientX; py = e.clientY;
+  });
+  lock.addEventListener("pointerup", (e) => {
+    if (!lockArmed) return;
+    lockArmed = false;
+    const dx = e.clientX - px, dy = e.clientY - py;
+    if (dy < -40 || (Math.abs(dx) < 12 && Math.abs(dy) < 12)) unlock();
+  });
+  lock.addEventListener("pointercancel", () => (lockArmed = false));
+  function unlock(){
+    if (unlocked) return;
+    unlocked = true;
+    sfx.unlock();
+    lock.classList.add("up");
+    toHome(true);
+  }
+
+  /* ============================================================ home screen */
+  const ORDER = ["msg", "health", "pep", "stride", "split", "notes"];
+  const NAMES = { msg: "Team Body", health: "Health", pep: "Pepero Express", stride: "Stride", split: "SplitLoad", notes: "Notes" };
+  const DECOY = {
+    mail: "The inbox can wait. It's not going anywhere, unfortunately 📭",
+    excel: "All 63 sheets are resting. So should you.",
+    cal: "Calendar has been asked to calm down.",
+    cam: "Smile! 📸 (Too late, you already did.)",
+    photos: "Too many good ones. Couldn't pick 📷",
+    settings: "Everything's set. Don't touch anything ⚙️",
+    calc: "Calculator is off duty. You've done enough maths for one lifetime 🧮",
+    phone: "Someone's waiting for the right moment to call… 📞",
+    safari: "No googling “how long do burns take to heal”. Doctor's orders 🩺",
+  };
+  const done = new Set();
+  const nextApp = () => ORDER.find((a) => !done.has(a));
+  let openApp = null, focusOn = false;
+  function updateNext(){
+    const n = nextApp();
+    $$(".ic[data-app]").forEach((ic) => {
+      ic.classList.toggle("next", ic.dataset.app === n);
+      ic.classList.toggle("done", done.has(ic.dataset.app));
+    });
+    $("#hint").innerHTML = n ? `Next up: <b>${NAMES[n]}</b> 👆`
+      : focusOn ? "Rest Focus is on 🌙" : "One last thing: turn on <b>Rest Focus</b> 🌙";
+  }
+  function toHome(first){
+    show("s-home"); sb.classList.remove("lock"); sbMode(false);
+    const h = $("#s-home");
+    h.classList.remove("enter"); void h.offsetWidth; h.classList.add("enter");
+    updateNext();
+    if (first) setTimeout(() => toast("Tap the bouncing app to start 👆"), 1000);
+  }
+  function markDone(a){
+    if (done.has(a)) return;
+    done.add(a);
+    const bar = $(`#a-${a} .donebar`);
+    if (bar) bar.classList.add("on");
+    setTimeout(() => sfx.chime(), 150);
+  }
+  function launch(a, ic){
+    const app = $(`#a-${a}`), r = ic.querySelector(".ico").getBoundingClientRect(), pr = phone.getBoundingClientRect();
+    app.style.setProperty("--ox", `${r.left + r.width / 2 - pr.left}px`);
+    app.style.setProperty("--oy", `${r.top + r.height / 2 - pr.top}px`);
+    app.classList.add("open");
+    openApp = a;
+    sbMode(app.dataset.sb === "dark");
+    sfx.open();
+    APPS[a]();
+  }
+  function closeApp(){
+    if (!openApp) return;
+    $(`#a-${openApp}`).classList.remove("open");
+    openApp = null;
+    sbMode(false);
+    sfx.close();
+    updateNext();
+    if (!nextApp() && !focusOn) setTimeout(() => { if (!openApp && !focusOn) openCC(); }, 1100);
+  }
+  function switchTo(a){
+    closeApp();
+    setTimeout(() => launch(a, $(`.ic[data-app="${a}"]`)), 450);
+  }
+  $$("[data-close]").forEach((b) => b.addEventListener("click", closeApp));
+  $("#s-home").addEventListener("click", (e) => {
+    const ic = e.target.closest(".ic[data-app]");
+    if (!ic) return;
+    const a = ic.dataset.app;
+    if (ORDER.includes(a)){
+      const n = nextApp();
+      if (done.has(a) || a === n) return launch(a, ic);
+      sfx.bonk();
+      toast(`One at a time 😌 Next up: ${NAMES[n]}`);
+      ic.classList.remove("no"); void ic.offsetWidth; ic.classList.add("no");
+      return;
+    }
+    if (a === "music"){
+      wantMusic ? pauseMusic() : playMusic();
+      return toast(wantMusic ? "🎵 Now playing: lo-fi beats to heal to" : "Music paused 🤫");
+    }
+    sfx.tap();
+    toast(DECOY[a]);
+  });
+  $("#hint").addEventListener("click", () => {
+    const n = nextApp();
+    if (n) launch(n, $(`.ic[data-app="${n}"]`));
+    else if (!focusOn) openCC();
+  });
+
+  /* ============================================================ app: Team Body */
+  const MEM = {
+    hand: ["Hand", "🤚", "#ff9f0a"], fingers: ["Fingers", "🤞", "#e6a800"], palm: ["Palm", "🫴", "#ff6b9a"], knee: ["Knee", "🦵", "#30b0c7"],
+    legs: ["Legs", "🏃‍♀️", "#28b463"], brain: ["Brain", "🧠", "#bf5af2"], heart: ["Heart", "❤️", "#ff453a"], tummy: ["Tummy", "🍫", "#a0683c"],
+    buddy: ["Running Buddy", "🏃‍♂️", "#0a84ff"],
+  };
+  const SCRIPT = [
+    ["day", "Friday 11:52 PM"],
+    ["hand", "ok so. small update."],
+    ["hand", { v: "friday" }],
+    ["hand", "I got burnt 🙂"],
+    ["fingers", "the backs of us too. we're in this together 🤞"],
+    ["knee", "me too, btw. not that anyone asked"],
+    ["palm", "I didn't get burnt. I just swelled up out of solidarity 🎈"],
+    ["brain", "noted. also reminder: new project, new role, VERY full plate 📋"],
+    ["heart", "guys. it's late. be nice to her tonight"],
+    ["day", "Saturday 6:40 AM"],
+    ["legs", "GOOD MORNING TEAM ☀️ we're running 4K"],
+    ["hand", "we're WHAT"],
+    ["legs", "4K. light jog. you just ride along"],
+    ["knee", "I'd like to speak to the manager"],
+    ["brain", "the manager is busy. new role, remember?"],
+    ["knee", "…unbelievable"],
+    ["day", "Sunday 6:15 AM"],
+    ["legs", "ok today is the 10K 💪"],
+    ["palm", "I am literally puffy"],
+    ["legs", "puffy AND aerodynamic. love that for us"],
+    ["hand", "I'm wrapped in a bandage"],
+    ["legs", "so you're already dressed for it 👌", "😂 3"],
+    ["heart", "wait… she's actually doing it"],
+    ["brain", "she always does it. it's her whole thing"],
+    ["sys", "Legs added Running Buddy to the group"],
+    ["buddy", "hi 👋 I'm the witness. all 10 km happened. she was unreal"],
+    ["knee", "and who are you exactly"],
+    ["legs", "he ran with us"],
+    ["knee", "so you're ALSO responsible"],
+    ["buddy", "in my defence, nobody can stop her"],
+    ["knee", "clearly 🙄"],
+    ["day", "Today"],
+    ["tummy", "sorry to interrupt, but has anyone said the word Pepero today", "🍫 4"],
+  ];
+  const REPLIES = [
+    ["PEPERO 🍫", [["tummy", "finally. leadership."], ["brain", "motion passed unanimously"], ["heart", "🫶"]]],
+    ["I'm fine, guys", [["knee", "you're fine?? I'm a KNEE"], ["heart", "you're allowed to not be fine, you know"], ["tummy", "Pepero would help. just saying"]]],
+    ["Everyone go to sleep", [["brain", "can't. new role."], ["legs", "can't. thinking about the next run"], ["heart", "she's right though. everyone rest. especially her 🫶"]]],
+  ];
+  const chat = $("#chat"), qr = $("#qr");
+  const chatWait = makePauser(chat);
+  const msgGate = () => until(() => openApp === "msg" && !videoOpen);
+  const scrollChat = () => chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
+  let EMOJI_ONLY = null;
+  try { EMOJI_ONLY = new RegExp("^(\\p{Extended_Pictographic}|\\u200d|\\ufe0f)+$", "u"); } catch (e) {}
+  function makeRow(who){
+    const [nm, em, c] = MEM[who];
+    const last = chat.lastElementChild, cont = !!last && last.dataset.who === who;
+    const row = el("div", "row in" + (cont ? " cont" : ""),
+      `<span class="av">${em}</span><div class="col">${cont ? "" : `<span class="nm">${nm}</span>`}<div class="bub dots"><i></i><i></i><i></i></div></div>`);
+    row.dataset.who = who;
+    row.style.setProperty("--c", c);
+    chat.appendChild(row);
+    scrollChat();
+    return row;
+  }
+  function fill(row, content){
+    const b = row.querySelector(".bub");
+    if (content.v){
+      b.className = "bub vid"; b.dataset.v = content.v;
+      b.innerHTML = `<img src="media/${content.v}.jpg" alt=""><span class="pl">▶</span><span class="du">${VDUR[content.v]}</span>`;
+      b.querySelector("img").onload = scrollChat;
+    } else {
+      b.className = "bub" + (EMOJI_ONLY && EMOJI_ONLY.test(content) ? " emo" : "");
+      b.textContent = content;
+    }
+    b.style.animation = "none"; void b.offsetWidth; b.style.animation = "";
+    row.style.animation = "none"; void row.offsetWidth; row.style.animation = "";
+    scrollChat();
+  }
+  let chatStarted = false;
+  function openMsg(){
+    if (chatStarted) return;
+    chatStarted = true;
+    const ff = $("#msgFF");
+    setTimeout(() => ff.classList.remove("off"), 1200);
+    setTimeout(() => ff.classList.add("off"), 6500);
+    runChat();
+  }
+  async function runChat(){
+    await wait(500);
+    for (const [who, content, rx] of SCRIPT){
+      await msgGate();
+      if (who === "day"){ chat.appendChild(el("div", "day", content)); scrollChat(); await chatWait(450); continue; }
+      if (who === "sys"){
+        chat.appendChild(el("div", "sys", content)); scrollChat(); sfx.tick();
+        $("#msgSub").textContent = "9 members";
+        await chatWait(1100); continue;
+      }
+      const row = makeRow(who);
+      await chatWait(content.v ? 1000 : Math.min(1700, 550 + content.length * 26));
+      await msgGate();
+      fill(row, content);
+      sfx.pop();
+      if (rx) setTimeout(() => { row.querySelector(".bub").appendChild(el("span", "rx", rx)); sfx.tick(); }, 800);
+      await chatWait(content.v ? 1800 : 380);
+    }
+    showReplies();
+  }
+  function showReplies(){
+    qr.innerHTML = "";
+    REPLIES.forEach((r) => {
+      if (r.used) return;
+      const b = el("button", null, r[0]);
+      b.addEventListener("click", () => reply(r));
+      qr.appendChild(b);
+    });
+    qr.classList.toggle("on", qr.children.length > 0);
+    $("#a-msg").style.setProperty("--cb", $("#a-msg .compose").offsetHeight + "px");
+    setTimeout(scrollChat, 60);
+  }
+  async function reply(r){
+    if (r.used) return;
+    r.used = true;
+    qr.classList.remove("on");
+    $("#a-msg").style.setProperty("--cb", $("#a-msg .compose").offsetHeight + "px");
+    const row = el("div", "row out", `<div class="bub">${r[0]}</div>`);
+    row.dataset.who = "me";
+    chat.appendChild(row); scrollChat(); sfx.send();
+    await chatWait(700);
+    for (const [who, text] of r[1]){
+      await msgGate();
+      const rw = makeRow(who);
+      await chatWait(Math.min(1400, 500 + text.length * 22));
+      fill(rw, text); sfx.pop();
+      await chatWait(380);
+    }
+    markDone("msg");
+    $("#a-msg").classList.add("fin");
+    showReplies();
+  }
+
+  /* ============================================================ app: Health */
+  let healthInit = false;
+  function openHealth(){
+    if (healthInit) return;
+    healthInit = true;
+    const bd = $("#hBd"), cards = $$(".hc", bd);
+    const reveal = (c) => {
+      if (c.classList.contains("in")) return;
+      io.unobserve(c);
+      c.classList.add("in");
+      $$("[data-count]", c).forEach((s) => countUp(s, +s.dataset.count, 1300));
+      const ring = $(".fg", c);
+      if (ring) setTimeout(() => (ring.style.strokeDashoffset = 163.36 * (1 - HEAL / 100)), 60);
+      if ($(".pepbar", c)) setTimeout(sfx.alarm, 400);
+    };
+    const io = new IntersectionObserver((ents) => ents.forEach((e) => {
+      if (e.isIntersecting) cards.slice(0, cards.indexOf(e.target) + 1).forEach(reveal);
+    }), { root: bd, threshold: .3 });
+    cards.forEach((c) => io.observe(c));
+    const io2 = new IntersectionObserver((ents) => {
+      if (ents[0].isIntersecting){ io2.disconnect(); markDone("health"); }
+    }, { root: bd, threshold: .6 });
+    io2.observe($("#hCta"));
+    bd.addEventListener("scroll", () => { if (bd.scrollTop > 40) $("#hMore").classList.add("off"); }, { passive: true });
+  }
+  $("#hCta").addEventListener("click", () => { markDone("health"); switchTo("pep"); });
+
+  /* ============================================================ app: Pepero Express */
+  let pepStarted = false;
+  function openPep(){}
+  $("#pepOrder").addEventListener("click", startDelivery);
+  async function startDelivery(){
+    if (pepStarted) return;
+    pepStarted = true;
+    sfx.success();
+    $("#pepCart").classList.add("hide"); $("#pepTrack").classList.remove("hide");
+    $("#pepBd").scrollTop = 0;
+    const tl = $$("#pepTl li"), st = $("#pepStatus");
+    const say = (t) => { st.textContent = t; st.classList.remove("swap"); void st.offsetWidth; st.classList.add("swap"); };
+    tl[0].classList.add("ok"); tl[1].classList.add("now");
+    say("Order confirmed! Packing with care… 📦");
+    await wait(1500);
+    tl[1].classList.replace("now", "ok"); tl[2].classList.add("now");
+    say("Running Buddy is jogging. Obviously.");
+    const path = $("#pepRoute"), L = path.getTotalLength(), runner = $("#pepRunner"), dp = $("#pepDoneP"), eta = $("#pepEta");
+    dp.style.strokeDasharray = L; dp.style.strokeDashoffset = L;
+    const STOP = 176 / L, A = 2800, P = 1700, C = 3000, T = A + P + C;
+    const t0 = performance.now();
+    let said = 0, lastStep = 0;
+    await new Promise((res) => {
+      const iv = setInterval(() => {
+        const ms = performance.now() - t0;
+        let e, bob = 0;
+        if (ms < A) e = STOP * (ms / A);
+        else if (ms < A + P){ e = STOP; bob = Math.abs(Math.sin((ms - A) / 170)) * -5; }
+        else e = STOP + (1 - STOP) * Math.min(1, (ms - A - P) / C);
+        const p = path.getPointAtLength(L * e);
+        runner.setAttribute("transform", `translate(${p.x.toFixed(1)} ${(p.y + bob).toFixed(1)})`);
+        dp.style.strokeDashoffset = L * (1 - e);
+        const left = Math.max(0, Math.ceil(9 * (1 - ms / T)));
+        eta.textContent = left ? `Arriving in 0:0${left}` : "Arriving now";
+        if (ms > A && said === 0){ said = 1; say("Waiting at a red light. Doing lunges. 🚦"); }
+        if (ms > A + P && said === 1){ said = 2; say("Almost there. Has never been this motivated."); }
+        if ((ms < A || ms > A + P) && ms - lastStep > 300){ lastStep = ms; sfx.step(); }
+        if (ms >= T){ clearInterval(iv); res(); }
+      }, 33);
+    });
+    tl[2].classList.replace("now", "ok"); tl[3].classList.add("ok");
+    say("Delivered. He says hi 👋");
+    sfx.doorbell();
+    await wait(1500);
+    $("#pepTrack").classList.add("hide");
+    $("#pepDone").classList.remove("hide"); $("#pepDone").classList.add("fadein");
+    $("#pepBd").scrollTop = 0;
+  }
+  $("#pepBox").addEventListener("click", () => {
+    const box = $("#pepBox");
+    if (box.classList.contains("open")) return;
+    box.classList.add("open");
+    $("#pepTap").classList.add("hide");
+    sfx.pop(); sfx.tada(); setTimeout(sfx.crunch, 350);
+    burstSticks(box, 26);
+    chargeBattery();
+    setTimeout(() => {
+      $("#pepAfter").classList.remove("hide"); $("#pepAfter").classList.add("fadein");
+      markDone("pep");
+    }, 1300);
+  });
+  function chargeBattery(){
+    const t0 = performance.now(), ms = 1800;
+    const iv = setInterval(() => {
+      const k = Math.min(1, (performance.now() - t0) / ms);
+      battery(3 + 97 * (1 - Math.pow(1 - k, 2)));
+      if (k >= 1){ clearInterval(iv); toast("🍫 Pepero fully charged: 100%"); }
+    }, 40);
+  }
+  function burstSticks(src, n){
+    const pr = phone.getBoundingClientRect(), r = src.getBoundingClientRect();
+    const cx = r.left + r.width / 2 - pr.left, cy = r.top + r.height * .4 - pr.top;
+    for (let i = 0; i < n; i++){
+      const s = el("i", "stick" + (i % 3 === 1 ? " alm" : i % 3 === 2 ? " wht" : ""));
+      s.style.left = cx - 3.5 + "px"; s.style.top = cy - 29 + "px";
+      phone.appendChild(s);
+      const ang = rnd(-155, -25) * Math.PI / 180, v = rnd(150, 320);
+      const dx = Math.cos(ang) * v, dy = Math.sin(ang) * v;
+      const r0 = rnd(-40, 40), r1 = r0 + rnd(-420, 420);
+      const a = s.animate([
+        { transform: `translate(0,0) rotate(${r0}deg) scale(.5)`, offset: 0, easing: "cubic-bezier(.15,.7,.35,1)" },
+        { transform: `translate(${dx}px,${dy}px) rotate(${(r0 + r1) / 2}deg) scale(1)`, offset: .36, easing: "cubic-bezier(.55,0,.85,.45)" },
+        { transform: `translate(${dx * 1.5}px,${pr.height - cy + 90}px) rotate(${r1}deg) scale(1)`, offset: 1 },
+      ], { duration: rnd(1500, 2300), fill: "forwards" });
+      a.onfinish = () => s.remove();
+    }
+  }
+
+  /* ============================================================ app: Stride */
+  let strideInit = false;
+  function openStride(){
+    if (strideInit) return;
+    strideInit = true;
+    const bd = $("#stBd"), p = $("#stPath");
+    p.style.setProperty("--len", Math.ceil(p.getTotalLength()) + 2);
+    const io = new IntersectionObserver((ents) => ents.forEach((e) => {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      if (e.target.id === "stRoute"){
+        e.target.classList.add("in");
+        countUp($("#stKm"), 10, 3000, (v) => v.toFixed(2));
+      } else $$(".bdg", e.target).forEach((b, i) => setTimeout(() => { b.classList.add("in"); sfx.chime(i); }, 200 + i * 280));
+    }), { root: bd, threshold: .45 });
+    io.observe($("#stRoute")); io.observe($("#stBadges"));
+    bd.addEventListener("scroll", () => { if (bd.scrollTop > 40) $("#stMore").classList.add("off"); }, { passive: true });
+  }
+  $("#stKudos").addEventListener("click", (e) => {
+    const b = e.currentTarget;
+    if (b.classList.contains("used")){ floatUp(b, "👍", 5); sfx.pop(); return; }
+    b.classList.add("used"); b.textContent = "Kudos given ✓";
+    floatUp(b, "👍", 16); sfx.success();
+    $("#stMsg").classList.add("on");
+    markDone("stride");
+  });
+  function floatUp(src, ch, n){
+    const pr = phone.getBoundingClientRect(), r = src.getBoundingClientRect();
+    for (let i = 0; i < n; i++){
+      const s = el("i", "thumb", ch);
+      s.style.left = r.left - pr.left + rnd(.15, .85) * r.width - 15 + "px";
+      s.style.top = r.top - pr.top + "px";
+      phone.appendChild(s);
+      const a = s.animate([
+        { transform: "translate(0,0) scale(.4)", opacity: 0 },
+        { transform: `translate(${rnd(-20, 20)}px,-60px) scale(1.15)`, opacity: 1, offset: .25 },
+        { transform: `translate(${rnd(-70, 70)}px,${-rnd(240, 400)}px) scale(.9) rotate(${rnd(-40, 40)}deg)`, opacity: 0 },
+      ], { duration: rnd(1300, 2000), delay: i * 45, easing: "cubic-bezier(.2,.7,.4,1)", fill: "both" });
+      a.onfinish = () => s.remove();
+    }
+  }
+
+  /* ============================================================ app: SplitLoad */
+  const SPLIT = [
+    { e: "😮‍💨", t: "Rants about work", r: "Send them over. I'll nod at all the right parts." },
+    { e: "🌀", t: "Overthinking", r: "Mine now. I'll overthink it on your behalf." },
+    { e: "🍫", t: "Pepero", no: "Pepero can't be split. Not sharing. Completely understandable." },
+    { e: "🌙", t: "Late-night worrying", r: "Night shift is mine." },
+    { e: "🛍️", t: "Carrying stuff", r: "Your hand is on leave. Bags are mine." },
+    { e: "✨", t: "Your brilliance", no: "Your brilliance is non-transferable, sorry." },
+    { e: "🫙", t: "Opening jars", r: "Finally, a job I'm qualified for." },
+    { e: "🩹", t: "Healing the hand", swap: "He can't heal it. But he can bring Pepero until it does." },
+    { e: "😵‍💫", t: "Meeting fatigue", r: "I'll be tired for you." },
+    { e: "💼", t: "The new role", no: "That one's yours. You earned it. He'll just be the cheerleader." },
+    { e: "📅", t: "Mondays", r: "I'll take Mondays. You take the rest of the week off. Kidding. Mostly." },
+    { e: "💪", t: "Being strong all the time", r: "You can put this one down for a bit. I've got it." },
+  ];
+  const TO_MOVE = SPLIT.filter((d) => !d.no).length;
+  let splitInit = false, moved = 0;
+  const mine = $("#myChips"), his = $("#hisChips");
+  function slSay(av, text){
+    const r = $("#slReply");
+    r.innerHTML = `<span class="av">${av}</span><span>${text}</span>`;
+    r.classList.remove("pop"); void r.offsetWidth; r.classList.add("pop");
+  }
+  function balance(){
+    const me = mine.querySelectorAll(".chip").length, him = his.querySelectorAll(".chip").length;
+    $("#cMe").textContent = me; $("#cHim").textContent = him;
+    $("#balMe").style.width = (me / (me + him)) * 100 + "%";
+    $("#balHim").style.width = (him / (me + him)) * 100 + "%";
+    $("#hisEmpty").classList.toggle("hide", him > 0);
+  }
+  function openSplit(){
+    if (splitInit) return;
+    splitInit = true;
+    SPLIT.forEach((d, i) => { const c = el("button", "chip", `${d.e} ${d.t}`); c.dataset.i = i; mine.appendChild(c); });
+    slSay("⚖️", "Current split: 100% you, 0% him. That's not a split, that's a solo.");
+    balance();
+  }
+  function flip(fn){
+    const chips = [...mine.children, ...his.children].filter((c) => c.classList.contains("chip"));
+    const before = new Map(chips.map((c) => [c, c.getBoundingClientRect()]));
+    fn();
+    balance();
+    [...mine.children, ...his.children].forEach((c) => {
+      const a = before.get(c);
+      if (!a) return;
+      const b = c.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top;
+      if (dx || dy) c.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: "none" }], { duration: 520, easing: "cubic-bezier(.3,.9,.3,1.1)" });
+    });
+  }
+  function shake(c){ c.classList.remove("no"); void c.offsetWidth; c.classList.add("no"); }
+  mine.addEventListener("click", (e) => {
+    const c = e.target.closest(".chip");
+    if (!c) return;
+    const d = SPLIT[c.dataset.i];
+    if (c.classList.contains("kept")){ shake(c); sfx.bonk(); return; }
+    if (d.no){ shake(c); sfx.bonk(); c.classList.add("kept"); slSay("⚖️", d.no); return; }
+    if (d.swap){
+      sfx.swish();
+      flip(() => {
+        c.textContent = "🩹 Healing (yours, sorry)"; c.classList.add("kept");
+        his.appendChild(el("span", "chip", "🍫 Pepero runs until it heals"));
+      });
+      slSay("⚖️", d.swap);
+    } else {
+      sfx.swish();
+      flip(() => his.appendChild(c));
+      slSay("🏃‍♂️", d.r);
+    }
+    moved++;
+    if (moved === 1){
+      const bd = $("#slBd"), hp = his.closest(".plate");
+      const over = hp.getBoundingClientRect().top + 90 - bd.getBoundingClientRect().bottom;
+      if (over > 0) bd.scrollBy({ top: over, behavior: "smooth" });
+    }
+    if (moved === TO_MOVE) setTimeout(settle, 1000);
+  });
+  function settle(){
+    $("#slSettle").innerHTML = `<div class="settle"><h3>✓ Settled up</h3>
+      <div class="srow"><span>You owe</span><b>nothing</b></div>
+      <div class="srow"><span>Interest</span><b>0%</b></div>
+      <div class="srow"><span>Due date</span><b>never</b></div>
+      <small>CA-approved split. Probably.</small></div>`;
+    sfx.kaching();
+    slSay("🏃‍♂️", "Pleasure doing business. Same time next week?");
+    const bd = $("#slBd");
+    setTimeout(() => bd.scrollTo({ top: bd.scrollHeight, behavior: "smooth" }), 80);
+    markDone("split");
+  }
+
+  /* ============================================================ app: Notes */
+  let notesInit = false;
+  const ntBd = $("#ntBd"), ntWait = makePauser(ntBd);
+  async function openNotes(){
+    if (notesInit) return;
+    notesInit = true;
+    await wait(650);
+    const T = $("#ntT");
+    for (const ch of "jessness"){ T.textContent += ch; sfx.key(); await wait(rnd(120, 200)); }
+    await wait(600);
+    for (const b of $$("#ntBody .blk")){
+      await until(() => openApp === "notes");
+      b.classList.add("in");
+      const r = b.getBoundingClientRect(), br = ntBd.getBoundingClientRect();
+      if (r.bottom > br.bottom - 110) ntBd.scrollBy({ top: r.bottom - br.bottom + 150, behavior: "smooth" });
+      const kill = !!$(".kill", b);
+      if (kill) sfx.chime(1);
+      await ntWait(kill ? 2400 : Math.min(5200, 1000 + b.textContent.trim().length * 30));
+    }
+    await wait(700);
+    markDone("notes");
+  }
+
+  const APPS = { msg: openMsg, health: openHealth, pep: openPep, stride: openStride, split: openSplit, notes: openNotes };
+
+  /* ============================================================ Control Center → Rest Focus */
+  const cc = $("#cc"), ccWait = makePauser(cc);
+  function openCC(){
+    if (cc.classList.contains("on")) return;
+    cc.classList.add("on"); sbMode(false); sfx.open();
+  }
+  cc.addEventListener("click", (e) => {
+    if (focusOn || e.target.closest(".cc-grid")) return;
+    cc.classList.remove("on"); sfx.close();
+  });
+  $("#focusTile").addEventListener("click", async () => {
+    if (focusOn) return;
+    focusOn = true;
+    phone.classList.add("focus");
+    $("#focusTile").classList.add("on"); $("#focusSt").textContent = "On";
+    $("#ccHint").style.visibility = "hidden";
+    $("#ccNote").classList.add("on");
+    updateNext();
+    sfx.focus();
+    await ccWait(5200);
+    cc.classList.remove("on");
+    await wait(700);
+    toast("🌙 Rest Focus on · 1,068 notifications silenced", 2600);
+    await wait(2600);
+    ring();
+  });
+
+  /* ============================================================ the call */
+  const LINES = [
+    "Hi! I'll be quick — you've got a hand to rest.",
+    "Also, Knee called me. He's still upset.",
+    "But honestly, this week came at you all at once.",
+    "You don't have to carry all of it by yourself. Send half my way.",
+    "And whenever it gets heavy, call. I'll pick up. Probably with Pepero.",
+    "Okay. That's it. Go rest. Proud of you.",
+  ];
+  const call = $("#s-call"), cap = $("#cap"), wave = $("#wave"), capWait = makePauser(call);
+  let callMode = "", callTimer = 0;
+  function ring(){
+    hold.add("call"); syncMusic();
+    show("s-call"); sbMode(false);
+    call.classList.add("ringing");
+    sfx.ring(true);
+    try { if (navigator.vibrate) navigator.vibrate([500, 300, 500, 300, 500]); } catch (e) {}
+  }
+  function stopRing(){
+    sfx.ring(false);
+    try { if (navigator.vibrate) navigator.vibrate(0); } catch (e) {}
+    call.classList.remove("ringing");
+  }
+  $("#bAccept").addEventListener("click", () => {
+    if (callMode) return;
+    callMode = "live";
+    stopRing(); sfx.connect();
+    call.classList.add("live");
+    $("#clSub").textContent = "";
+    let s = 0;
+    const lbl = $("#clLbl");
+    lbl.textContent = "0:00";
+    callTimer = setInterval(() => { s++; lbl.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }, 1000);
+    runCaptions(false);
+  });
+  $("#bDecline").addEventListener("click", async () => {
+    if (callMode) return;
+    callMode = "voice";
+    stopRing(); sfx.hang();
+    call.classList.add("declined");
+    $("#clLbl").textContent = "call declined";
+    cap.className = "cap-box dim in";
+    cap.textContent = "Declined? He saw that coming. Switching to voice note…";
+    await wait(2800);
+    call.classList.remove("declined"); call.classList.add("voice");
+    $("#clLbl").textContent = "voice note"; $("#clSub").textContent = "";
+    $(".vn span").textContent = "❚❚";
+    let s = 0;
+    callTimer = setInterval(() => { s++; $("#vnT").textContent = `0:${String(s).padStart(2, "0")}`; }, 1000);
+    runCaptions(true);
+  });
+  async function runCaptions(voice){
+    $("#capTap").classList.remove("hide");
+    let tok = 0;
+    for (let i = 0; i < LINES.length; i++){
+      cap.className = "cap-box";
+      await wait(320);
+      cap.textContent = LINES[i];
+      cap.classList.add("in");
+      const me = ++tok, sec = sfx.voice(LINES[i]);
+      wave.classList.add("talk");
+      setTimeout(() => { if (me === tok) wave.classList.remove("talk"); }, Math.max(1200, sec * 1000));
+      if (voice) $("#vnBar").style.width = ((i + 1) / LINES.length) * 100 + "%";
+      await capWait(1600 + LINES[i].length * 58);
+      sfx.hush(); wave.classList.remove("talk");
+    }
+    $("#capTap").classList.add("hide");
+    $("#hangLbl").textContent = voice ? "Done" : "End";
+    call.classList.add("canend");
+  }
+  $("#bHang").addEventListener("click", () => {
+    sfx.hang();
+    clearInterval(callTimer);
+    hold.delete("call");
+    toEnd();
+  });
+
+  /* ============================================================ installed */
+  function toEnd(){
+    show("s-end"); sbMode(true);
+    syncMusic();
+    setTimeout(sfx.success, 500);
+    setTimeout(() => burstSticks($(".chk"), 18), 650);
+  }
+  $("#endShare").addEventListener("click", async () => {
+    const text = "🍫 JessOS 26.11 installed. Pepero at 100%. Plate: split.";
+    if (navigator.share){
+      try { await navigator.share({ text }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+    }
+    location.href = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  });
+  $("#endAgain").addEventListener("click", () => location.reload());
+
+  /* ============================================================ test hook: ?at=lock|home|<app>|focus|call|end */
+  const AT = (/[?&]at=(\w+)/.exec(Q) || [])[1];
+  if (AT){
+    installing = true;
+    const idx = ORDER.indexOf(AT);
+    (idx >= 0 ? ORDER.slice(0, idx) : ["focus", "call", "end"].includes(AT) ? ORDER : []).forEach((a) => done.add(a));
+    if (AT === "lock") toLock();
+    else if (AT === "end") toEnd();
+    else if (AT === "call"){ focusOn = true; phone.classList.add("focus"); ring(); }
+    else {
+      unlocked = true; sb.classList.add("on");
+      toHome(false);
+      if (AT === "focus") setTimeout(openCC, 700);
+      else if (idx >= 0) setTimeout(() => launch(AT, $(`.ic[data-app="${AT}"]`)), 800);
+    }
+  }
+})();
+</script>
+</body>
+</html>
