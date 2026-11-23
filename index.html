@@ -33,7 +33,9 @@
   img{ display:block; max-width:100%; -webkit-user-drag:none; }
   .hide{ display:none !important; }
 
-  #phone{ position:relative; width:100%; height:100vh; height:100dvh; margin:0 auto; overflow:hidden; background:#000; isolation:isolate; container-type:size; }
+  #phone{ position:relative; width:100%; height:100vh; height:100dvh; margin:0 auto; overflow:hidden; background:#000; isolation:isolate; container-type:size; touch-action:none; }
+  /* the browser may only pan inside the real scrolling lists; anywhere else a finger that slips while tapping stays a tap */
+  .up-scroll, .app-bd, .chat{ touch-action:pan-y; }
   @media (min-width:600px){
     body{ display:grid; place-items:center; background:radial-gradient(70% 60% at 50% 40%, #3b2342, #140f1a); }
     #phone{ width:390px; height:min(844px, calc(100dvh - 48px)); border-radius:52px;
@@ -294,7 +296,6 @@
   .vth .vt{ position:absolute; left:8px; right:8px; bottom:8px; padding:7px 8px; border-radius:99px; background:rgba(0,0,0,.6); color:#fff; font:700 13px var(--sys); text-align:center;
     -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
   .bub.vid .tm{ position:static; display:block; text-align:right; margin:3px 5px 0; }
-  .bub.vid.nudge{ animation:shake .45s; }
   .bub.emo{ background:none; box-shadow:none; font-size:40px; line-height:1.1; padding:0 2px; }
   .bub.emo::before{ display:none; }
   .bub.emo .nm{ font-size:13px; line-height:1.3; }
@@ -697,7 +698,6 @@
 
   /* ---------- small bits ---------- */
   #sb.lock #sbTime{ visibility:hidden; }
-  #s-lock{ touch-action:none; }
   .photo-cap{ text-align:center; }
   [data-toast]{ cursor:pointer; }
   @media (max-height:660px){
@@ -1249,11 +1249,79 @@
   const THEME = { "s-update": "#fdf8fc", "s-install": "#000000", "s-lock": "#3b1d4b", "s-home": "#3b1d4b", "s-call": "#3a2458", "s-end": "#ffe2da" };
   /* right after something opens or closes, ignore taps for a moment: the second half of a double-tap,
      or an impatient extra tap, would otherwise land on whatever just appeared under the finger */
-  let quietT = 0;
-  const quiet = (ms = 350) => { quietT = Math.max(quietT, performance.now() + ms); };
+  let quietT = 0, tapT = -1e9;
+  const quiet = (ms = 450) => { quietT = Math.max(quietT, performance.now() + ms); };
   document.addEventListener("click", (e) => {
-    if (performance.now() < quietT){ e.stopImmediatePropagation(); e.preventDefault(); }
+    const t = performance.now();
+    if (t < quietT || (e.isTrusted && t - tapT < 600)){ e.stopImmediatePropagation(); e.preventDefault(); }
   }, true);
+
+  /* ============================================================ taps */
+  /* A phone only makes a click if the finger barely moves (about 8px) and lifts quickly. A tap that slips a little,
+     or a slow press (how her other hand taps), is silently dropped. So taps are read from the touches here, far more
+     forgivingly, and the phone's own click is cancelled so nothing fires twice. */
+  const TAP = "button, [data-v], [data-toast], [data-music], #draft, .nt, #coach, video";
+  const LAYER = ".screen, .app, #cc, #player, #escape";
+  const NEAR = [[0, -10], [0, 10], [-10, 0], [10, 0], [-9, -9], [9, -9], [-9, 9], [9, 9]];
+  const fingers = new Map();
+  /* as the phone itself does, a touch just beside something tappable is meant for it */
+  function aim(x, y, n){
+    if (n.closest(TAP)) return n;
+    for (const [dx, dy] of NEAR){
+      const m = document.elementFromPoint(x + dx, y + dy);
+      if (m && m.closest(TAP)) return m;
+    }
+    return n;
+  }
+  document.addEventListener("touchstart", (e) => {
+    if (e.touches.length === e.changedTouches.length) fingers.clear();
+    for (const t of e.changedTouches){
+      const n = t.target.closest ? t.target : t.target.parentElement;
+      if (!n || n.closest("a[href]")) continue;
+      const m = aim(t.clientX, t.clientY, n);
+      fingers.set(t.identifier, { n: m, a: m.closest(TAP) || m, x: t.clientX, y: t.clientY, t0: performance.now(),
+        slop: m.closest(".chat, .app-bd, .up-scroll") ? 16 : 30, far: false, long: false });
+    }
+  }, { passive: true });
+  document.addEventListener("touchmove", (e) => {
+    for (const t of e.changedTouches){
+      const f = fingers.get(t.identifier);
+      if (f && Math.hypot(t.clientX - f.x, t.clientY - f.y) > f.slop) f.far = true;
+    }
+  }, { passive: true });
+  document.addEventListener("touchend", (e) => {
+    for (const t of e.changedTouches){
+      const f = fingers.get(t.identifier);
+      fingers.delete(t.identifier);
+      if (!f || f.far || performance.now() - f.t0 > 2000) continue;
+      if (e.cancelable) e.preventDefault();
+      tap(f);
+    }
+  }, { passive: false });
+  document.addEventListener("touchcancel", (e) => {
+    for (const t of e.changedTouches){
+      const f = fingers.get(t.identifier);
+      fingers.delete(t.identifier);
+      if (f && f.long && !f.far) tap(f);
+    }
+  }, { passive: true });
+  /* a slow press turns into a long press: no menu, and it still counts as the tap she meant */
+  document.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    fingers.forEach((f) => (f.long = true));
+  });
+  function tap(f){
+    tapT = performance.now();
+    const a = f.a, n = f.n.isConnected ? f.n : a;
+    if (!a.isConnected) return;
+    const r = a.getBoundingClientRect();
+    const x = Math.min(Math.max(f.x, r.left + 1), r.right - 1), y = Math.min(Math.max(f.y, r.top + 1), r.bottom - 1);
+    const top = document.elementFromPoint(x, y);
+    /* something that opened over it while the finger was down wasn't what she pressed */
+    if (!top || !(a.contains(top) || top.closest("#coach") || (top.contains(a) && top.closest(LAYER) === a.closest(LAYER)))) return;
+    n.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window, detail: 1, clientX: x, clientY: y }));
+  }
+
   function show(id){
     $$(".screen").forEach((s) => s.classList.toggle("on", s.id === id));
     quiet();
@@ -1296,14 +1364,17 @@
     "E5:1 G5:1 E5:1 D5:1", "D5:1.5 C5:.5 D5:2", "-:1 A4:1 C5:1 D5:1", "E5:3 -:1",
     "A5:1.5 G5:.5 E5:1 D5:1", "G5:1.5 E5:.5 D5:2", "C5:1 D5:1 E5:1 G5:1", "E5:2 D5:1 C5:1",
   ];
-  function wav(d, sr, k){
-    const n = d.length, b = new ArrayBuffer(44 + n * 2), v = new DataView(b);
+  function wav(pcm, sr){
+    const v = new DataView(new ArrayBuffer(44)), n = pcm.length * 2;
     const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
-    w(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); w(8, "WAVE"); w(12, "fmt ");
+    w(0, "RIFF"); v.setUint32(4, 36 + n, true); w(8, "WAVE"); w(12, "fmt ");
     v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, sr, true);
-    v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, "data"); v.setUint32(40, n * 2, true);
-    for (let i = 0; i < n; i++) v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, d[i] * k)) * 32767, true);
-    return new Blob([b], { type: "audio/wav" });
+    v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, "data"); v.setUint32(40, n, true);
+    return new Blob([v.buffer, pcm], { type: "audio/wav" });
+  }
+  /* two million samples in one go would freeze every tap on a slower phone, so the work pauses now and then */
+  async function inChunks(n, fn){
+    for (let i = 0; i < n; i += 1e5){ fn(i, Math.min(n, i + 1e5)); await wait(0); }
   }
   function impulse(c, sec){
     const n = Math.floor(c.sampleRate * sec), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
@@ -1371,6 +1442,7 @@
     mix.connect(dry); mix.connect(rev); rev.connect(wet); dry.connect(c.destination); wet.connect(c.destination);
     const S = BEAT / 4;
     for (let b = 0; b < BARS; b++){
+      if (b % 4 === 3) await wait(0);
       const t0 = b * BAR, [root, ch] = CHORDS[b % 4], R = NOTE(root), fs = ch.split(" ").map(NOTE);
       fs.forEach((f, k) => { ep(c, keys, f, t0 + k * .018, BEAT * 2.4, .062); ep(c, keys, f, t0 + 2.5 * BEAT + k * .012, BEAT * 1.4, .04); });
       bass(c, keys, R, t0, BEAT * 2.2, .15); bass(c, keys, R, t0 + 2.5 * BEAT, BEAT * 1.2, .11);
@@ -1388,14 +1460,14 @@
     const done = new Promise((res) => { c.oncomplete = (e) => res(e.renderedBuffer); });
     const p = c.startRendering();
     const buf = await (p && p.then ? p : done);
-    const d = buf.getChannelData(0), n = Math.round(L * sr), loop = new Float32Array(n);
+    const d = buf.getChannelData(0), n = Math.round(L * sr), loop = new Float32Array(n), pcm = new Int16Array(n);
     loop.set(d.subarray(0, n));
     for (let i = n; i < d.length; i++) loop[i - n] += d[i];
     let peak = 0;
-    for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(loop[i]));
-    const k = peak ? 1 / peak : 1, sat = Math.tanh(2.2);
-    for (let i = 0; i < n; i++) loop[i] = Math.tanh(loop[i] * k * 2.2) / sat;
-    return wav(loop, sr, .5);
+    await inChunks(n, (a, b) => { for (let i = a; i < b; i++) peak = Math.max(peak, Math.abs(loop[i])); });
+    const k = (peak ? 1 / peak : 1) * 2.2, gain = .5 * 32767 / Math.tanh(2.2);
+    await inChunks(n, (a, b) => { for (let i = a; i < b; i++) pcm[i] = Math.tanh(loop[i] * k) * gain; });
+    return wav(pcm, sr);
   }
 
   const music = new Audio();
@@ -1436,7 +1508,7 @@
     if (MUTE) return;
     try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
     ac();
-    if (!musicReady){ music.src = URL.createObjectURL(wav(new Float32Array(4410), 44100, 1)); music.play().catch(() => {}); }
+    if (!musicReady){ music.src = URL.createObjectURL(wav(new Int16Array(4410), 44100)); music.play().catch(() => {}); }
     playMusic();
   }
 
@@ -1531,6 +1603,8 @@
       setTimeout(() => g.disconnect(), 250);
     },
   };
+  /* a sound that fails must never take down the tap that played it */
+  for (const k in sfx){ const f = sfx[k]; sfx[k] = (...a) => { try { return f(...a); } catch (e) { return 0; } }; }
 
   /* ============================================================ video player */
   const VDUR = { friday: "0:10", run10k: "0:11", monday: "0:11", pepero: "0:10" };
@@ -1652,7 +1726,7 @@
     lockArmed = true; py = e.clientY;
   });
   lock.addEventListener("pointerup", (e) => {
-    if (lockArmed && e.clientY - py < -40) unlock();
+    if (lockArmed && e.clientY - py < -30) unlock();
     lockArmed = false;
   });
   lock.addEventListener("pointercancel", () => (lockArmed = false));
@@ -1710,13 +1784,17 @@
     setTimeout(() => sfx.chime(), 150);
     refreshCue();
   }
+  let miniBarT = 0;
   function fillMini(a, ic){
-    const m = $("#miniIc"), src = $(".ico", ic);
+    const m = $("#miniIc"), src = $(".ico", ic), bar = $("#a-mini .donebar");
     m.className = src.className; m.style.cssText = src.style.cssText; m.innerHTML = src.innerHTML;
     $$("[id]", m).forEach((n) => n.removeAttribute("id"));
     $("#miniT").textContent = $(".lbl", ic).textContent;
     $("#miniTx").textContent = DECOY[a];
     $("#miniPlay").hidden = a !== "music";
+    /* "Back to home" sits right where the dock icons are, so it waits: a second tap on the icon mustn't close it */
+    bar.classList.remove("on");
+    clearTimeout(miniBarT); miniBarT = setTimeout(() => { bar.classList.add("on"); refreshCue(); }, 800);
   }
   function launch(a, ic){
     if (openApp) return;
@@ -1916,7 +1994,7 @@
     await chatWait(900);
   }
   /* her replies arrive pre-typed: one tap on send, nothing to choose */
-  let draft = "", sent = null;
+  let draft = "", sent = null, sendSoon = false;
   async function sendGate(text){
     inp.classList.add("draft");
     draftTx.textContent = "";
@@ -1924,11 +2002,17 @@
     draft = text;
     inp.classList.add("ready");
     buzz(12);
-    refreshCue();
-    await new Promise((res) => (sent = res));
+    const p = new Promise((res) => (sent = res));
+    if (sendSoon){ sendSoon = false; doSend(); } else refreshCue();
+    await p;
   }
   function doSend(){
-    if (!draft) return toast("No typing today. Your hand is on leave ✋");
+    if (!draft){
+      /* tapped while the reply is still filling itself in: send it the moment it's ready */
+      if (inp.classList.contains("draft")) sendSoon = true;
+      else toast("No typing today. Your hand is on leave ✋");
+      return;
+    }
     const text = draft, res = sent;
     draft = ""; sent = null;
     inp.classList.remove("ready", "draft");
@@ -1945,12 +2029,11 @@
   }
   sendB.addEventListener("click", doSend);
   $("#draft").addEventListener("click", doSend);
+  /* a tap anywhere in the chat does the one thing it's waiting for */
   chat.addEventListener("click", (e) => {
-    if (draft) return toast("Tap the green ➤ to send it");
-    if (!chatVid || e.target.closest(".vth")) return;
-    const b = chatVid.closest(".bub");
-    b.classList.remove("nudge"); void b.offsetWidth; b.classList.add("nudge");
-    toast("Tap the video first ▶ It's only 10 seconds");
+    if (e.target.closest(".vth")) return;
+    if (draft || inp.classList.contains("draft")) return doSend();
+    if (chatVid) openVideo(chatVid.dataset.v);
   });
   const setCb = () => $("#a-msg").style.setProperty("--cb", $("#a-msg .compose").offsetHeight + "px");
 
@@ -2507,7 +2590,7 @@
       return bar ? next(2400) : uncue();
     }
     if (a === "notes") return bar ? next(1500) : uncue();
-    if (a === "mini") return next(2600);
+    if (a === "mini") return next(1800);
     uncue();
   }
   function refreshCue(){
@@ -2535,7 +2618,7 @@
     uncue();
   }
 
-  /* ============================================================ Android: back button closes things, long-press does nothing */
+  /* ============================================================ Android: back button closes things */
   let guard = 0, leaveT = 0;
   document.addEventListener("click", () => {
     if (guard >= 2) return;
@@ -2549,14 +2632,6 @@
     if (performance.now() - leaveT < 2500) return history.go(-(guard + 1));
     leaveT = performance.now();
     toast("Press back again to leave JessOS", 2400);
-  });
-  /* Android turns a slow press into a long press and then sends no click at all, so treat it as the tap she meant */
-  const COARSE = matchMedia("(pointer: coarse)").matches;
-  document.addEventListener("contextmenu", (e) => {
-    e.preventDefault();
-    if (!COARSE && e.pointerType !== "touch") return;
-    const t = e.target.closest("button, [data-toast], [data-v], #draft, .nt, #coach");
-    if (t && performance.now() >= quietT){ t.click(); quiet(900); }
   });
 
   /* ============================================================ test hook: ?at=lock|home|<app>|focus|call|end */
