@@ -29,6 +29,7 @@
   html,body{ height:100%; background:#140f1a; overflow:hidden; overscroll-behavior:none; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
   body{ font-family:var(--sys); -webkit-font-smoothing:antialiased; color:#fff; touch-action:manipulation; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
   button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; text-align:inherit; }
+  button, [data-toast], [data-v]{ touch-action:manipulation; }
   img{ display:block; max-width:100%; -webkit-user-drag:none; }
   .hide{ display:none !important; }
 
@@ -70,8 +71,8 @@
   #sb.dark #battTxt.low{ color:#ff3b30; }
 
   /* ---------- screens ---------- */
-  .screen{ position:absolute; inset:0; z-index:5; opacity:0; visibility:hidden; transition:opacity .6s ease, visibility 0s linear .6s; }
-  .screen.on{ opacity:1; visibility:visible; transition:opacity .6s ease; }
+  .screen{ position:absolute; inset:0; z-index:5; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .6s ease, visibility 0s linear .6s; }
+  .screen.on{ opacity:1; visibility:visible; pointer-events:auto; transition:opacity .6s ease; }
 
   /* update (Android-style system update) */
   #s-update{ z-index:9; background:#fdf8fc; color:#1d1b20; display:flex; flex-direction:column; }
@@ -136,10 +137,10 @@
   .np .tx span{ font:400 12.5px var(--sys); opacity:.75; }
   .np button{ width:42px; height:42px; border-radius:50%; font-size:17px; display:grid; place-items:center; background:rgba(255,255,255,.14); }
   .fp{ flex:none; margin-top:14px; width:64px; height:64px; border-radius:50%; display:grid; place-items:center; color:#fff;
-    background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.3); opacity:.5; transition:transform .15s, background .4s, opacity .4s; }
+    background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.3); opacity:.5; transition:background .2s, opacity .4s; }
   .fp svg{ width:36px; height:36px; fill:currentColor; }
   .fp.on{ opacity:1; background:rgba(255,255,255,.22); }
-  .fp:active{ transform:scale(.92); }
+  .fp:active{ background:rgba(255,255,255,.34); }
   .lk-hint{ margin-top:8px; min-height:17px; font:500 13px var(--sys); opacity:0; transition:opacity .5s; text-shadow:0 2px 10px rgba(40,10,60,.35); }
   .lk-hint.on{ opacity:.85; }
   @keyframes hint{ 50%{ transform:translateY(-5px); } }
@@ -170,6 +171,7 @@
   .badge{ position:absolute; top:-6px; left:calc(50% + 18px); min-width:22px; height:22px; padding:0 6px; border-radius:11px; background:#ff3b30; color:#fff;
     font:600 13px/22px var(--sys); text-align:center; box-shadow:0 2px 6px rgba(0,0,0,.25); transform:scale(0); transition:transform .35s cubic-bezier(.3,1.6,.5,1); }
   .ic.next .badge, .ic.always .badge{ transform:scale(1); }
+  .badge.up{ left:auto; right:calc(50% - 41px); padding:0 5px; font-size:12px; background:#30d158; }
   .ic.next .ico{ box-shadow:0 0 0 3px rgba(255,255,255,.8), 0 6px 18px rgba(0,0,0,.25); }
   .chr{ width:38px; height:38px; border-radius:50%;
     background:radial-gradient(circle, #4285f4 0 31%, #fff 32% 42%, transparent 43%), conic-gradient(from -60deg, #ea4335 0 120deg, #fbbc05 0 240deg, #34a853 0 360deg); }
@@ -209,9 +211,9 @@
 
   /* ---------- apps (shared) ---------- */
   .app{ position:absolute; inset:0; z-index:20; display:flex; flex-direction:column; background:#fff; color:#111; overflow:hidden;
-    border-radius:44px; transform:scale(.12); transform-origin:var(--ox, 50%) var(--oy, 50%); opacity:0; visibility:hidden;
+    border-radius:44px; transform:scale(.12); transform-origin:var(--ox, 50%) var(--oy, 50%); opacity:0; visibility:hidden; pointer-events:none;
     transition:transform .5s cubic-bezier(.2,.85,.25,1), opacity .3s, border-radius .5s, visibility 0s linear .5s; }
-  .app.open{ transform:none; opacity:1; border-radius:0; visibility:visible; transition:transform .5s cubic-bezier(.2,.85,.25,1), opacity .2s, border-radius .5s; }
+  .app.open{ transform:none; opacity:1; border-radius:0; visibility:visible; pointer-events:auto; transition:transform .5s cubic-bezier(.2,.85,.25,1), opacity .2s, border-radius .5s; }
   .app-hd{ position:relative; z-index:3; flex:none; display:flex; align-items:center; gap:10px; min-height:calc(86px + var(--top)); padding:calc(34px + var(--top)) 14px 8px;
     border-bottom:1px solid var(--sep); background:rgba(255,255,255,.94); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); }
   .back{ flex:none; width:44px; height:44px; margin:0 2px 0 -6px; border-radius:50%; display:grid; place-items:center; color:inherit; }
@@ -222,7 +224,8 @@
   .donebar{ position:absolute; z-index:5; left:0; right:0; bottom:0; padding:16px 20px calc(18px + var(--bot)); display:flex; justify-content:center;
     pointer-events:none; opacity:0; transform:translateY(24px); transition:opacity .45s, transform .45s cubic-bezier(.2,.9,.3,1.2); }
   .donebar.on{ opacity:1; transform:none; }
-  .donebar button{ pointer-events:auto; padding:15px 28px; border-radius:99px; background:#16121c; color:#fff; font:600 16px var(--sys);
+  .app.open .donebar.on button{ pointer-events:auto; }
+  .donebar button{ padding:15px 28px; border-radius:99px; background:#16121c; color:#fff; font:600 16px var(--sys);
     box-shadow:0 10px 30px rgba(0,0,0,.3); animation:breathe 1.9s ease-in-out infinite; }
   .donebar button::before{ content:"⌂  "; }
   .vbadge{ position:absolute; left:10px; top:10px; padding:5px 10px; border-radius:99px; background:rgba(0,0,0,.55); color:#fff; font:700 11px var(--sys); letter-spacing:.06em;
@@ -313,12 +316,12 @@
   .inp.draft .fld{ color:#111b21; }
   .inp.draft .fld span::after{ content:""; display:inline-block; width:2px; height:1.1em; margin-left:1px; vertical-align:-3px; background:#00a884; animation:caret 1s steps(1) infinite; }
   @keyframes caret{ 50%{ opacity:0; } }
-  .snd{ width:46px; height:46px; border-radius:50%; flex:none; background:#00a884; color:#fff; display:grid; place-items:center; transition:transform .15s; }
+  .snd{ width:46px; height:46px; border-radius:50%; flex:none; background:#00a884; color:#fff; display:grid; place-items:center; transition:background .15s; }
   .snd svg{ grid-area:1/1; width:23px; height:23px; fill:currentColor; transition:transform .25s, opacity .25s; }
   .snd .arr{ opacity:0; transform:scale(.4) rotate(-30deg); }
   .inp.ready .snd .mic{ opacity:0; transform:scale(.4); }
   .inp.ready .snd .arr{ opacity:1; transform:none; }
-  .snd:active{ transform:scale(.9); }
+  .snd:active{ background:#008f6f; }
   #a-msg .donebar{ bottom:var(--cb, 64px); padding-bottom:10px; }
   #a-msg.fin .chat{ padding-bottom:78px; }
 
@@ -538,8 +541,8 @@
   /* ---------- Quick Settings (Android) ---------- */
   #cc{ position:absolute; inset:0; z-index:70; padding:calc(50px + var(--top)) 16px 20px; color:#ece6f0;
     background:rgba(18,13,24,.84); -webkit-backdrop-filter:blur(26px) saturate(1.2); backdrop-filter:blur(26px) saturate(1.2);
-    opacity:0; visibility:hidden; transform:translateY(-60px); transition:opacity .45s, transform .5s cubic-bezier(.2,.9,.3,1), visibility 0s linear .5s; }
-  #cc.on{ opacity:1; visibility:visible; transform:none; transition:opacity .45s, transform .5s cubic-bezier(.2,.9,.3,1); }
+    opacity:0; visibility:hidden; pointer-events:none; transform:translateY(-60px); transition:opacity .45s, transform .5s cubic-bezier(.2,.9,.3,1), visibility 0s linear .5s; }
+  #cc.on{ opacity:1; visibility:visible; pointer-events:auto; transform:none; transition:opacity .45s, transform .5s cubic-bezier(.2,.9,.3,1); }
   .cc-hint{ font:500 15px var(--sys); text-align:center; margin:0 0 14px; opacity:.9; }
   .qs-bright{ position:relative; max-width:380px; height:46px; margin:0 auto 12px; border-radius:23px; background:#3a3342; overflow:hidden; }
   .qs-bright i{ position:absolute; left:0; top:0; bottom:0; width:64%; border-radius:23px; background:#d7c4ff; }
@@ -625,8 +628,8 @@
   .end-f{ margin-top:14px; font:400 12.5px var(--sys); opacity:.55; }
 
   /* ---------- video player, toast ---------- */
-  #player{ position:absolute; inset:0; z-index:95; display:grid; place-items:center; background:rgba(0,0,0,.9); opacity:0; visibility:hidden; transition:opacity .3s, visibility 0s linear .3s; }
-  #player.on{ opacity:1; visibility:visible; transition:opacity .3s; }
+  #player{ position:absolute; inset:0; z-index:95; display:grid; place-items:center; background:rgba(0,0,0,.9); opacity:0; visibility:hidden; pointer-events:none; transition:opacity .3s, visibility 0s linear .3s; }
+  #player.on{ opacity:1; visibility:visible; pointer-events:auto; transition:opacity .3s; }
   .pl-box{ position:relative; width:86%; width:min(92cqw, calc((100cqh - 150px) * .6667)); aspect-ratio:2/3; }
   .pl-box video{ width:100%; height:100%; display:block; border-radius:20px; background:#000; object-fit:cover; }
   .pl-x{ position:absolute; z-index:2; top:calc(14px + var(--top)); right:14px; height:40px; padding:0 16px; border-radius:99px; background:rgba(255,255,255,.2); color:#fff;
@@ -635,8 +638,8 @@
   .pl-prog i{ display:block; height:100%; width:0; background:#fff; }
   .pl-end.on #plDone{ animation:ringP 1.3s ease-out infinite; }
   .pl-end{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; border-radius:20px;
-    background:rgba(0,0,0,.45); opacity:0; visibility:hidden; transition:.3s; }
-  .pl-end.on{ opacity:1; visibility:visible; }
+    background:rgba(0,0,0,.45); opacity:0; visibility:hidden; pointer-events:none; transition:.3s; }
+  .pl-end.on{ opacity:1; visibility:visible; pointer-events:auto; }
   .pl-end button{ min-width:180px; padding:14px 22px; border-radius:99px; background:#fff; color:#111; font:700 15.5px var(--sys); text-align:center; }
   .pl-end button + button{ background:rgba(255,255,255,.2); color:#fff; }
   .pl-tap{ position:absolute; inset:0; display:none; place-items:center; color:#fff; font:700 17px var(--sys); background:rgba(0,0,0,.35); border-radius:20px; }
@@ -662,8 +665,8 @@
 
   /* ---------- coach: where the next tap goes ---------- */
   #coach{ position:absolute; z-index:92; left:0; top:0; display:flex; flex-direction:column; align-items:center; cursor:pointer;
-    opacity:0; visibility:hidden; transition:opacity .25s, visibility 0s linear .25s; }
-  #coach.on{ opacity:1; visibility:visible; transition:opacity .25s; }
+    opacity:0; visibility:hidden; pointer-events:none; transition:opacity .25s, visibility 0s linear .25s; }
+  #coach.on{ opacity:1; visibility:visible; pointer-events:auto; transition:opacity .25s; }
   #coachHand{ height:38px; font-size:32px; line-height:38px; filter:drop-shadow(0 3px 5px rgba(0,0,0,.35)); animation:chU .9s ease-in-out infinite; }
   #coach.above{ flex-direction:column-reverse; }
   #coach.above #coachHand{ animation-name:chD; }
@@ -671,7 +674,7 @@
   #coach.right #coachHand{ animation-name:chL; }
   #coach.left{ flex-direction:row-reverse; gap:2px; }
   #coach.left #coachHand{ animation-name:chR; }
-  #coach.down #coachHand, #coach.up #coachHand{ display:none; }
+  #coach.down #coachHand, #coach.up #coachHand, #coach.pin #coachHand{ display:none; }
   #coachLbl{ padding:8px 15px; border-radius:99px; background:var(--cue); color:#1d1600; font:700 14.5px/1.25 var(--sys); white-space:nowrap;
     box-shadow:0 6px 18px rgba(0,0,0,.28), 0 0 0 2px rgba(255,255,255,.7); }
   #coach.down #coachLbl, #coach.up #coachLbl{ animation:hint 1.4s ease-in-out infinite; }
@@ -686,7 +689,6 @@
   /* ---------- small bits ---------- */
   #sb.lock #sbTime{ visibility:hidden; }
   #s-lock{ touch-action:none; }
-  .ic.no .ico{ animation:shake .45s; }
   .photo-cap{ text-align:center; }
   [data-toast]{ cursor:pointer; }
   @media (max-height:660px){
@@ -810,7 +812,7 @@
       <button class="ic noisy always" data-app="cal" style="--i:8"><span class="ico cal" style="--bg:#fff"><small id="calDay">MON</small><b id="calDate">23</b></span><span class="lbl">Calendar</span><span class="badge">6</span></button>
       <button class="ic" data-app="cam" style="--i:9"><span class="ico" style="--bg:linear-gradient(160deg,#e5e5ea,#8e8e93)">📷</span><span class="lbl">Camera</span></button>
       <button class="ic" data-app="photos" style="--i:10"><span class="ico" style="--bg:#fff">🌸</span><span class="lbl">Photos</span></button>
-      <button class="ic" data-app="settings" style="--i:11"><span class="ico" style="--bg:linear-gradient(160deg,#aeaeb2,#636366)">⚙️</span><span class="lbl">Settings</span></button>
+      <button class="ic noisy always" data-app="stocks" style="--i:11"><span class="ico" style="--bg:linear-gradient(160deg,#2c2c2e,#0b0b0c)">📈</span><span class="lbl">Stocks</span><span class="badge up">▲32%</span></button>
       <button class="ic" data-app="calc" style="--i:12"><span class="ico" style="--bg:linear-gradient(160deg,#48484a,#1c1c1e)">🧮</span><span class="lbl">Calculator</span></button>
     </div>
     <div class="batw" style="--i:13" data-toast="Running Buddy is fully charged and on standby 🔋">
@@ -1040,7 +1042,7 @@
 
   <!-- ============ app: Notes ============ -->
   <section class="app" id="a-notes" data-sb="dark" data-theme="#fffdf7">
-    <header class="app-hd"><button class="back" data-close aria-label="Back"><svg><use href="#backS"/></svg></button><span class="nt-ic">⋮</span></header>
+    <header class="app-hd"><button class="back" data-close aria-label="Back"><svg><use href="#backS"/></svg></button><span class="nt-ic" data-toast="No edits allowed. This one stays exactly as written ✍️">⋮</span></header>
     <div class="app-bd" id="ntBd">
       <p class="nt-meta">Shared by 🏃‍♂️ Running Buddy · Edited Sunday, after 10 km</p>
       <h1 class="nt-title"><span id="ntT"></span><i class="caret"></i></h1>
@@ -1231,9 +1233,15 @@
   }
 
   let toastT = 0;
-  function toast(msg, ms = 2700){
+  /* `near`: show it right next to what was tapped, so the answer appears where she's looking */
+  function toast(msg, ms = 2700, near){
     const t = $("#toast");
-    t.textContent = msg; t.classList.add("on");
+    t.textContent = msg; t.style.top = "";
+    if (near){
+      const r = near.getBoundingClientRect(), pr = phone.getBoundingClientRect(), above = r.top - pr.top - t.offsetHeight - 10;
+      t.style.top = (above > 40 ? above : r.bottom - pr.top + 10) + "px";
+    }
+    t.classList.add("on");
     clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), ms);
   }
   function countUp(node, to, ms = 1400, fmt = (v) => Math.round(v)){
@@ -1543,7 +1551,7 @@
     const v = e.target.closest("[data-v]");
     if (v){ openVideo(v.dataset.v); return; }
     const tt = e.target.closest("[data-toast]");
-    if (tt){ toast(tt.dataset.toast); sfx.tap(); }
+    if (tt){ toast(tt.dataset.toast, undefined, tt); sfx.tap(); }
   });
 
   /* ============================================================ software update → install */
@@ -1638,7 +1646,7 @@
     cal: "Calendar has been asked to calm down.",
     cam: "Smile! 📸 (Too late, you already did.)",
     photos: "Too many good ones. Couldn't pick 📷",
-    settings: "Everything's set. Don't touch anything ⚙️",
+    stocks: "NVDA ▲32% since the CEO came back. He returned… with interest 📈",
     calc: "Calculator is off duty. You've done enough maths for one lifetime 🧮",
     phone: "Someone's waiting for the right moment to call… 📞",
     chrome: "No googling “how long do burns take to heal”. Doctor's orders 🩺",
@@ -1672,6 +1680,7 @@
     refreshCue();
   }
   function launch(a, ic){
+    if (openApp) return;
     const app = $(`#a-${a}`), r = ic.querySelector(".ico").getBoundingClientRect(), pr = phone.getBoundingClientRect();
     app.style.setProperty("--ox", `${r.left + r.width / 2 - pr.left}px`);
     app.style.setProperty("--oy", `${r.top + r.height / 2 - pr.top}px`);
@@ -1701,20 +1710,13 @@
     const ic = e.target.closest(".ic[data-app]");
     if (!ic) return;
     const a = ic.dataset.app;
-    if (ORDER.includes(a)){
-      const n = nextApp();
-      if (done.has(a) || a === n) return launch(a, ic);
-      sfx.bonk();
-      toast(`One at a time 😌 Next up: ${NAMES[n]}`);
-      ic.classList.remove("no"); void ic.offsetWidth; ic.classList.add("no");
-      return;
-    }
+    if (ORDER.includes(a)) return launch(a, ic);
     if (a === "music"){
       wantMusic ? pauseMusic() : playMusic();
-      return toast(wantMusic ? "🎵 Now playing: lo-fi beats to heal to" : "Music paused 🤫");
+      return toast(wantMusic ? "🎵 Now playing: lo-fi beats to heal to" : "Music paused 🤫", undefined, ic);
     }
     sfx.tap();
-    toast(DECOY[a]);
+    toast(DECOY[a], undefined, ic);
   });
   $("#hint").addEventListener("click", () => {
     const n = nextApp();
@@ -1764,6 +1766,10 @@
     ["buddy", "in my defence, nobody can stop her"],
     ["knee", "clearly 🙄"],
     ["day", "Today", ""],
+    ["brain", "unrelated, but NVIDIA is up 32% 📈"],
+    ["heart", "NVIDIA?? the boyfriend who cheated on us??"],
+    ["brain", "the CEO's back. he says sorry. 32% sorry"],
+    ["heart", "…fine. we're taking him back 💅", "😂 4"],
     ["tummy", "sorry to interrupt, but has anyone said the word Pepero today", "🍫 4"],
     ["me", "PEPERO 🍫"],
     ["tummy", "finally. leadership."],
@@ -2369,7 +2375,13 @@
     const seen = Math.min(r.bottom, vb) - Math.max(r.top, vt), dir = r.top + r.height / 2 > (vt + vb) / 2 ? "down" : "up";
     let mode = !sc || seen >= r.height * .8 || (r.height > (vb - vt) * .8 && seen >= 44) ? "tap" : dir;
     let x, y, place = "";
-    if (mode === "tap"){
+    if (mode === "tap" && cueOpt.place === "pin"){
+      setText(cueText);
+      const a = (cueOpt.at || t).getBoundingClientRect();
+      place = "pin";
+      x = Math.max(vl + 8, Math.min(vr - 8 - lblW, a.left + a.width / 2 - lblW / 2));
+      y = a.top + a.height / 2 - lblH / 2;
+    } else if (mode === "tap"){
       setText(cueText);
       const cx = r.left + r.width / 2, cy = r.top + r.height / 2, H = HAND + lblH, RW = 36 + lblW;
       const fits = { below: r.bottom + 2 + H <= vb, above: r.top - 2 - H >= vt, right: r.right + 4 + RW <= vr - 6, left: r.left - 4 - RW >= vl + 6,
@@ -2395,7 +2407,7 @@
     if (key !== cueKey){
       cueKey = key;
       coach.style.transform = `translate3d(${px}px,${py}px,0)`;
-      ["above", "right", "left", "down", "up"].forEach((c) => coach.classList.toggle(c, place === c));
+      ["above", "right", "left", "down", "up", "pin"].forEach((c) => coach.classList.toggle(c, place === c));
       if (HANDS[place] && cHand.textContent !== HANDS[place]) cHand.textContent = HANDS[place];
     }
     cueMode = mode;
@@ -2480,7 +2492,7 @@
       const n = nextApp();
       if (n){
         const ic = $(`.ic[data-app="${n}"]`);
-        return cue(ic, done.size ? "Tap to open" : "Start here", { place: "below", ring: $(".ico", ic), delay: 1100 });
+        return cue(ic, done.size ? "👆 Tap to open" : "👆 Start here", { place: "pin", at: $(".lbl", ic), ring: $(".ico", ic), delay: 1100 });
       }
       if (!focusOn) return cue($("#hint"), "Tap for the last step", { place: "above", delay: 1600 });
     }
