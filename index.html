@@ -161,6 +161,8 @@
   .wx-f{ grid-column:1 / -1; font:italic 500 12px var(--sys); opacity:.85; margin-top:4px; }
   .grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:16px 6px; margin-top:20px; }
   .ic{ position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; }
+  /* stretch every icon's tap area over the gaps around it, so no tap between icons is lost */
+  .ic::after{ content:""; position:absolute; inset:-8px -3px; }
   .ico{ position:relative; width:62px; height:62px; border-radius:15px; display:grid; place-items:center; font-size:31px; background:var(--bg);
     box-shadow:0 4px 12px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.35); transition:transform .15s; }
   .ic:active .ico{ transform:scale(.9); }
@@ -537,6 +539,13 @@
   .note-body hr{ border:0; border-top:1.5px dashed #e5dcc4; margin:22px 0; }
   .note-body .kill{ font-weight:700; }
   .note-body .kill b{ background:linear-gradient(transparent 60%, #ffe58a 60%); }
+
+  /* ---------- every other icon ---------- */
+  .mini-bd{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; padding:20px 28px calc(110px + var(--bot)); text-align:center; }
+  #miniIc{ transform:scale(1.6); margin:22px 0; }
+  #miniTx{ max-width:310px; font:500 21px/1.45 var(--sys); color:#1c1c1e; text-wrap:balance; }
+  .mini-play{ width:68px; height:68px; border-radius:50%; background:#fa2d48; color:#fff; font:700 24px var(--sys); text-align:center; box-shadow:0 10px 24px rgba(250,45,72,.35); transition:background .15s; }
+  .mini-play:active{ background:#cf1f39; }
 
   /* ---------- Quick Settings (Android) ---------- */
   #cc{ position:absolute; inset:0; z-index:70; padding:calc(50px + var(--top)) 16px 20px; color:#ece6f0;
@@ -1061,6 +1070,17 @@
     <div class="donebar"><button data-close>Back to home</button></div>
   </section>
 
+  <!-- ============ every other icon opens a small screen of its own ============ -->
+  <section class="app" id="a-mini" data-sb="dark" data-theme="#ffffff">
+    <header class="app-hd"><button class="back" data-close aria-label="Back"><svg><use href="#backS"/></svg></button><span class="hd-t" id="miniT"></span></header>
+    <div class="mini-bd">
+      <span class="ico" id="miniIc"></span>
+      <p id="miniTx"></p>
+      <button class="mini-play" id="miniPlay" data-music aria-label="Play or pause the music" hidden>❚❚</button>
+    </div>
+    <div class="donebar on"><button data-close>Back to home</button></div>
+  </section>
+
   <!-- ============ Quick Settings ============ -->
   <div id="cc">
     <p class="cc-hint" id="ccHint">One last setting before you go 🌙</p>
@@ -1177,9 +1197,9 @@
   const UA = navigator.userAgent, ANDROID = /Android/i.test(UA);
   const IN_APP = /Instagram|FBAN|FBAV|FB_IAB|Line\/|Snapchat|Twitter/i.test(UA) && !/[?&]stay\b/.test(Q);
   if (IN_APP){
-    const here = location.host + location.pathname, out = $("#eOut");
+    const here = location.host + location.pathname + Q, out = $("#eOut");
     out.href = ANDROID
-      ? `intent://${here}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(`https://${here}?stay`)};end`
+      ? `intent://${here}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(`https://${here}${Q ? "&" : "?"}stay`)};end`
       : `x-safari-https://${here}`;
     out.textContent = ANDROID ? "Open in Chrome ›" : "Open in Safari ›";
     $("#eWhere").textContent = ANDROID ? "Chrome" : "Safari";
@@ -1227,8 +1247,16 @@
   battery(3);
 
   const THEME = { "s-update": "#fdf8fc", "s-install": "#000000", "s-lock": "#3b1d4b", "s-home": "#3b1d4b", "s-call": "#3a2458", "s-end": "#ffe2da" };
+  /* right after something opens or closes, ignore taps for a moment: the second half of a double-tap,
+     or an impatient extra tap, would otherwise land on whatever just appeared under the finger */
+  let quietT = 0;
+  const quiet = (ms = 350) => { quietT = Math.max(quietT, performance.now() + ms); };
+  document.addEventListener("click", (e) => {
+    if (performance.now() < quietT){ e.stopImmediatePropagation(); e.preventDefault(); }
+  }, true);
   function show(id){
     $$(".screen").forEach((s) => s.classList.toggle("on", s.id === id));
+    quiet();
     refreshCue();
   }
 
@@ -1516,7 +1544,7 @@
     vid.poster = `media/${name}.jpg`;
     vid.src = `media/${name}.mp4`;
     vid.muted = MUTE;
-    player.classList.add("on");
+    player.classList.add("on"); quiet();
     mediaInfo(VTITLE[name], () => vid.play().catch(() => {}), () => vid.pause());
     const p = vid.play();
     if (p && p.catch) p.catch(() => { plTap.textContent = "▶ Tap to play"; plTap.classList.add("on"); });
@@ -1525,7 +1553,7 @@
   function closeVideo(){
     videoOpen = false;
     vid.pause();
-    player.classList.remove("on");
+    player.classList.remove("on"); quiet();
     if (curVid){
       watched.add(curVid);
       $$(`[data-v="${curVid}"] .vt`).forEach((n) => (n.textContent = "↺ Watch again"));
@@ -1598,7 +1626,7 @@
     ["Notes", "#e0a100", "📝", "Shared note", "“jessness” was edited", "now"],
   ];
   const lock = $("#s-lock");
-  let unlocked = false, lockArmed = false, lockReady = false, px = 0, py = 0;
+  let unlocked = false, lockArmed = false, lockReady = false, py = 0;
   async function toLock(){
     show("s-lock"); sb.classList.add("on", "lock"); sbMode(false);
     const box = $("#lkNotifs");
@@ -1617,18 +1645,20 @@
     buzz(30);
     refreshCue();
   }
+  /* a swipe up unlocks on finger-up, but a tap unlocks on its click: unlocking on finger-up would let
+     that same tap's click land on whatever the home screen has underneath */
   lock.addEventListener("pointerdown", (e) => {
     if (e.target.closest("[data-music]")) return;
-    lockArmed = true; px = e.clientX; py = e.clientY;
+    lockArmed = true; py = e.clientY;
   });
   lock.addEventListener("pointerup", (e) => {
-    if (!lockArmed) return;
+    if (lockArmed && e.clientY - py < -40) unlock();
     lockArmed = false;
-    const dx = e.clientX - px, dy = e.clientY - py, tap = Math.abs(dx) < 12 && Math.abs(dy) < 12;
-    if (dy < -40 || (tap && (lockReady || e.target.closest(".fp, .nt")))) unlock();
   });
   lock.addEventListener("pointercancel", () => (lockArmed = false));
-  $("#lkFp").addEventListener("click", () => unlock());
+  lock.addEventListener("click", (e) => {
+    if (!e.target.closest("[data-music]") && (lockReady || e.target.closest(".fp, .nt"))) unlock();
+  });
   function unlock(){
     if (unlocked) return;
     unlocked = true;
@@ -1650,6 +1680,7 @@
     calc: "Calculator is off duty. You've done enough maths for one lifetime 🧮",
     phone: "Someone's waiting for the right moment to call… 📞",
     chrome: "No googling “how long do burns take to heal”. Doctor's orders 🩺",
+    music: "JessOS Radio: lo‑fi beats to heal to 🎧",
   };
   const done = new Set();
   const nextApp = () => ORDER.find((a) => !done.has(a));
@@ -1679,22 +1710,34 @@
     setTimeout(() => sfx.chime(), 150);
     refreshCue();
   }
+  function fillMini(a, ic){
+    const m = $("#miniIc"), src = $(".ico", ic);
+    m.className = src.className; m.style.cssText = src.style.cssText; m.innerHTML = src.innerHTML;
+    $$("[id]", m).forEach((n) => n.removeAttribute("id"));
+    $("#miniT").textContent = $(".lbl", ic).textContent;
+    $("#miniTx").textContent = DECOY[a];
+    $("#miniPlay").hidden = a !== "music";
+  }
   function launch(a, ic){
     if (openApp) return;
-    const app = $(`#a-${a}`), r = ic.querySelector(".ico").getBoundingClientRect(), pr = phone.getBoundingClientRect();
+    const id = APPS[a] ? a : "mini";
+    if (id === "mini") fillMini(a, ic);
+    const app = $(`#a-${id}`), r = ic.querySelector(".ico").getBoundingClientRect(), pr = phone.getBoundingClientRect();
     app.style.setProperty("--ox", `${r.left + r.width / 2 - pr.left}px`);
     app.style.setProperty("--oy", `${r.top + r.height / 2 - pr.top}px`);
     app.classList.add("open");
-    openApp = a;
+    openApp = id;
+    quiet();
     sbMode(app.dataset.sb === "dark");
     sfx.open();
-    APPS[a]();
+    if (APPS[id]) APPS[id]();
     refreshCue();
   }
   function closeApp(){
     if (!openApp) return;
     $(`#a-${openApp}`).classList.remove("open");
     openApp = null;
+    quiet();
     sbMode(false);
     sfx.close();
     updateNext();
@@ -1708,15 +1751,7 @@
   $$("[data-close]").forEach((b) => b.addEventListener("click", closeApp));
   $("#s-home").addEventListener("click", (e) => {
     const ic = e.target.closest(".ic[data-app]");
-    if (!ic) return;
-    const a = ic.dataset.app;
-    if (ORDER.includes(a)) return launch(a, ic);
-    if (a === "music"){
-      wantMusic ? pauseMusic() : playMusic();
-      return toast(wantMusic ? "🎵 Now playing: lo-fi beats to heal to" : "Music paused 🤫", undefined, ic);
-    }
-    sfx.tap();
-    toast(DECOY[a], undefined, ic);
+    if (ic) launch(ic.dataset.app, ic);
   });
   $("#hint").addEventListener("click", () => {
     const n = nextApp();
@@ -2205,12 +2240,12 @@
   const cc = $("#cc"), ccWait = makePauser(cc);
   function openCC(){
     if (cc.classList.contains("on")) return;
-    cc.classList.add("on"); sbMode(false); sfx.open(); buzz(10);
+    cc.classList.add("on"); quiet(); sbMode(false); sfx.open(); buzz(10);
     refreshCue();
   }
   function closeCC(){
     if (!cc.classList.contains("on")) return;
-    cc.classList.remove("on"); sfx.close();
+    cc.classList.remove("on"); quiet(); sfx.close();
     refreshCue();
   }
   cc.addEventListener("click", (e) => { if (!focusOn && e.target === cc) closeCC(); });
@@ -2472,6 +2507,7 @@
       return bar ? next(2400) : uncue();
     }
     if (a === "notes") return bar ? next(1500) : uncue();
+    if (a === "mini") return next(2600);
     uncue();
   }
   function refreshCue(){
@@ -2492,7 +2528,7 @@
       const n = nextApp();
       if (n){
         const ic = $(`.ic[data-app="${n}"]`);
-        return cue(ic, done.size ? "👆 Tap to open" : "👆 Start here", { place: "pin", at: $(".lbl", ic), ring: $(".ico", ic), delay: 1100 });
+        return cue(ic, done.size ? "👆 Next" : "👆 Start", { place: "pin", at: $(".lbl", ic), ring: $(".ico", ic), delay: 1100 });
       }
       if (!focusOn) return cue($("#hint"), "Tap for the last step", { place: "above", delay: 1600 });
     }
@@ -2514,7 +2550,14 @@
     leaveT = performance.now();
     toast("Press back again to leave JessOS", 2400);
   });
-  document.addEventListener("contextmenu", (e) => e.preventDefault());
+  /* Android turns a slow press into a long press and then sends no click at all, so treat it as the tap she meant */
+  const COARSE = matchMedia("(pointer: coarse)").matches;
+  document.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    if (!COARSE && e.pointerType !== "touch") return;
+    const t = e.target.closest("button, [data-toast], [data-v], #draft, .nt, #coach");
+    if (t && performance.now() >= quietT){ t.click(); quiet(900); }
+  });
 
   /* ============================================================ test hook: ?at=lock|home|<app>|focus|call|end */
   const AT = (/[?&]at=(\w+)/.exec(Q) || [])[1];
