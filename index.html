@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f2f2f7">
+<meta name="theme-color" content="#fdf8fc">
 <title>JessOS 26.11 · Weekend Recovery Update</title>
 <meta name="description" content="JessOS 26.11 is ready to install. Weekend Recovery Update · 14 km. Sound on.">
 <meta property="og:title" content="JessOS 26.11 is ready to install 📲">
@@ -19,14 +19,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --sys:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --round:ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --sys:system-ui, -apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --round:ui-rounded, "SF Pro Rounded", system-ui, -apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", sans-serif;
     --hand:"Caveat", "Bradley Hand", "Segoe Print", cursive;
     --top:env(safe-area-inset-top, 0px); --bot:env(safe-area-inset-bottom, 0px);
-    --blue:#0a84ff; --sep:rgba(60,60,67,.13);
+    --blue:#0a84ff; --sep:rgba(60,60,67,.13); --md:#7a4c9c; --cue:#ffd60a;
   }
   *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-  html,body{ height:100%; background:#140f1a; overflow:hidden; overscroll-behavior:none; }
+  html,body{ height:100%; background:#140f1a; overflow:hidden; overscroll-behavior:none; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
   body{ font-family:var(--sys); -webkit-font-smoothing:antialiased; color:#fff; touch-action:manipulation; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
   button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; text-align:inherit; }
   img{ display:block; max-width:100%; -webkit-user-drag:none; }
@@ -73,30 +73,29 @@
   .screen{ position:absolute; inset:0; z-index:5; opacity:0; visibility:hidden; transition:opacity .6s ease, visibility 0s linear .6s; }
   .screen.on{ opacity:1; visibility:visible; transition:opacity .6s ease; }
 
-  /* update */
-  #s-update{ z-index:9; background:#f2f2f7; color:#111; display:flex; flex-direction:column; }
-  .up-nav{ flex:none; padding:calc(40px + var(--top)) 16px 8px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; font:600 17px var(--sys); }
-  .up-nav .bk{ color:var(--blue); font-weight:400; }
-  .up-scroll{ flex:1; overflow-y:auto; padding:6px 16px 10px; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
-  .up-card{ background:#fff; border-radius:16px; padding:18px 16px 6px; animation:rise .7s cubic-bezier(.2,.8,.3,1) both; }
+  /* update (Android-style system update) */
+  #s-update{ z-index:9; background:#fdf8fc; color:#1d1b20; display:flex; flex-direction:column; }
+  .up-nav{ flex:none; display:flex; align-items:center; gap:4px; padding:calc(38px + var(--top)) 10px 4px; font:400 22px var(--sys); }
+  .up-scroll{ flex:1; overflow-y:auto; padding:8px 16px 10px; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+  .up-card{ background:#f5ecf6; border-radius:28px; padding:20px 18px 8px; animation:rise .7s cubic-bezier(.2,.8,.3,1) both; }
   @keyframes rise{ from{ opacity:0; transform:translateY(16px); } }
   .up-head{ display:flex; gap:14px; align-items:center; }
   .logo{ width:64px; height:64px; flex:none; border-radius:15px; filter:drop-shadow(0 4px 10px rgba(255,122,107,.35)); }
-  .up-head h1{ font:700 19px/1.2 var(--sys); }
-  .up-head p{ font:400 14px/1.35 var(--sys); color:#3c3c43; }
-  .up-head .dim{ color:#8e8e93; font-size:13px; }
-  .up-intro{ margin:16px 0 2px; font:400 15px/1.45 var(--sys); color:#1c1c1e; }
+  .up-head h1{ font:600 20px/1.2 var(--sys); }
+  .up-head p{ font:400 14px/1.35 var(--sys); color:#49454f; }
+  .up-head .dim{ color:#7a7480; font-size:13px; }
+  .up-intro{ margin:16px 0 2px; font:400 15px/1.45 var(--sys); color:#1d1b20; }
   .up-card h2{ font:600 15px var(--sys); margin:14px 0 4px; }
   .up-list{ list-style:none; }
-  .up-list li{ display:flex; gap:12px; padding:10px 0; border-top:1px solid var(--sep); font:400 14.5px/1.42 var(--sys); color:#1c1c1e; }
+  .up-list li{ display:flex; gap:12px; padding:10px 0; border-top:1px solid rgba(73,69,79,.14); font:400 14.5px/1.42 var(--sys); color:#1d1b20; }
   .up-list li i{ font-style:normal; font-size:20px; line-height:1.1; width:26px; text-align:center; flex:none; }
   .up-list b{ font-weight:600; }
   .up-act{ flex:none; padding:10px 20px calc(14px + var(--bot)); display:flex; flex-direction:column; align-items:center; gap:2px; }
-  .btn-primary{ width:100%; max-width:360px; padding:16px; border-radius:14px; background:var(--blue); color:#fff; font:600 17px var(--sys); text-align:center;
-    box-shadow:0 8px 24px rgba(10,132,255,.35); animation:breathe 2.2s ease-in-out infinite; }
+  .btn-primary{ width:100%; max-width:360px; padding:16px; border-radius:99px; background:var(--md); color:#fff; font:600 17px var(--sys); text-align:center;
+    box-shadow:0 8px 22px rgba(122,76,156,.35); animation:breathe 2.2s ease-in-out infinite; }
   @keyframes breathe{ 50%{ transform:scale(1.03); } }
-  .btn-text{ padding:12px; color:var(--blue); font:400 16px var(--sys); }
-  .up-sound{ font:500 12.5px var(--sys); color:#8e8e93; }
+  .btn-text{ padding:12px; color:var(--md); font:600 15.5px var(--sys); }
+  .up-sound{ font:500 12.5px var(--sys); color:#7a7480; }
 
   /* install */
   #s-install{ z-index:9; background:#000; display:grid; place-items:center; }
@@ -106,39 +105,46 @@
   .bar i{ display:block; height:100%; width:0; background:#fff; border-radius:6px; transition:width 1s ease; }
   #insMsg{ margin-top:20px; font:500 15px/1.4 var(--sys); min-height:42px; color:#f2f2f7; transition:opacity .25s; text-wrap:balance; }
   #insEta{ margin-top:2px; font:400 12.5px var(--sys); color:#8e8e93; min-height:16px; }
+  .ins-sit{ margin-top:30px; font:500 13.5px var(--sys); color:#b9b2c2; }
   #s-install.boot .bar, #s-install.boot p{ opacity:0; transition:opacity .5s; }
   #s-install.boot .logo{ animation:bootp 1.5s ease-in-out infinite; }
   @keyframes bootp{ 50%{ transform:scale(1.07); filter:drop-shadow(0 0 26px rgba(255,143,177,.8)); } }
 
   /* lock */
-  #s-lock{ z-index:7; display:flex; flex-direction:column; align-items:center; padding:calc(46px + var(--top)) 14px calc(10px + var(--bot)); }
+  #s-lock{ z-index:7; display:flex; flex-direction:column; align-items:center; padding:calc(44px + var(--top)) 14px calc(12px + var(--bot)); }
   #s-lock.up{ transform:translateY(-100%); opacity:0; transition:transform .6s cubic-bezier(.4,0,.2,1), opacity .6s; }
-  .lk-lock{ font-size:17px; }
-  .lk-date{ margin-top:6px; font:600 18px var(--sys); opacity:.92; text-shadow:0 2px 12px rgba(40,10,60,.3); }
-  .lk-time{ font:700 86px/1 var(--round); letter-spacing:-.02em; margin-top:2px; text-shadow:0 4px 30px rgba(60,20,80,.3); }
+  .lk-lock{ font-size:16px; opacity:.9; }
+  .lk-time{ font:500 84px/1 var(--round); letter-spacing:-.01em; margin-top:4px; text-shadow:0 4px 30px rgba(60,20,80,.3); }
+  .lk-date{ margin-top:6px; font:500 17px var(--sys); opacity:.95; text-shadow:0 2px 12px rgba(40,10,60,.3); }
   .lk-wid{ display:flex; gap:8px; margin-top:12px; }
   .wpill{ padding:7px 11px; border-radius:99px; background:rgba(255,255,255,.18); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); font:600 12.5px var(--sys); }
-  .lk-notifs{ width:100%; max-width:400px; margin-top:auto; display:flex; flex-direction:column; gap:7px; padding-bottom:9px; }
-  .nt{ display:flex; gap:11px; align-items:center; padding:10px 13px; border-radius:20px; color:#fff;
-    background:rgba(255,255,255,.2); -webkit-backdrop-filter:blur(22px) saturate(1.4); backdrop-filter:blur(22px) saturate(1.4);
-    animation:ntin .55s cubic-bezier(.2,.9,.3,1.2) both; }
-  @keyframes ntin{ from{ opacity:0; transform:translateY(-14px) scale(.94); } }
-  .nt .ai{ width:34px; height:34px; border-radius:9px; display:grid; place-items:center; font-size:19px; flex:none; background:var(--c); }
+  .lk-notifs{ width:100%; max-width:420px; margin-top:auto; display:flex; flex-direction:column; gap:6px; padding-bottom:8px; }
+  .nt{ display:flex; gap:12px; align-items:flex-start; padding:11px 14px 12px; border-radius:22px; color:#fff; text-align:left;
+    background:rgba(32,22,44,.6); -webkit-backdrop-filter:blur(18px) saturate(1.3); backdrop-filter:blur(18px) saturate(1.3);
+    animation:ntin .55s cubic-bezier(.2,.9,.3,1.15) both; }
+  @keyframes ntin{ from{ opacity:0; transform:translateY(-14px) scale(.95); } }
+  .nt .ai{ width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-size:17px; flex:none; background:var(--c); margin-top:2px; }
   .nt .tx{ flex:1; min-width:0; }
-  .nt .h{ display:flex; justify-content:space-between; font:600 11.5px/1.2 var(--sys); opacity:.8; text-transform:uppercase; letter-spacing:.02em; }
-  .nt .h span{ text-transform:none; font-weight:400; }
-  .nt b{ display:block; font:600 14.5px/1.25 var(--sys); margin-top:1px; }
-  .nt p{ font:400 14px/1.3 var(--sys); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .np{ width:100%; max-width:400px; display:flex; align-items:center; gap:12px; padding:9px 10px 9px 12px; border-radius:20px;
+  .nt .h{ font:500 12px/1.2 var(--sys); opacity:.72; }
+  .nt b{ display:block; font:600 15px/1.25 var(--sys); margin-top:3px; }
+  .nt p{ font:400 14px/1.35 var(--sys); opacity:.92; }
+  .np{ width:100%; max-width:420px; display:flex; align-items:center; gap:12px; padding:9px 10px 9px 12px; border-radius:22px;
     background:rgba(25,10,35,.3); -webkit-backdrop-filter:blur(22px); backdrop-filter:blur(22px); }
   .art{ width:40px; height:40px; border-radius:9px; flex:none; background:linear-gradient(135deg,#ff8a7a,#b49bff); display:grid; place-items:center; font-size:18px; }
   .np .tx{ flex:1; min-width:0; }
   .np b{ display:block; font:600 14px/1.25 var(--sys); }
   .np .tx span{ font:400 12.5px var(--sys); opacity:.75; }
   .np button{ width:42px; height:42px; border-radius:50%; font-size:17px; display:grid; place-items:center; background:rgba(255,255,255,.14); }
-  .lk-hint{ margin-top:12px; font:600 14.5px var(--sys); opacity:.92; animation:hint 1.8s ease-in-out infinite; text-shadow:0 2px 10px rgba(40,10,60,.35); }
+  .fp{ flex:none; margin-top:14px; width:64px; height:64px; border-radius:50%; display:grid; place-items:center; color:#fff;
+    background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.3); opacity:.5; transition:transform .15s, background .4s, opacity .4s; }
+  .fp svg{ width:36px; height:36px; fill:currentColor; }
+  .fp.on{ opacity:1; background:rgba(255,255,255,.22); }
+  .fp:active{ transform:scale(.92); }
+  .lk-hint{ margin-top:8px; min-height:17px; font:500 13px var(--sys); opacity:0; transition:opacity .5s; text-shadow:0 2px 10px rgba(40,10,60,.35); }
+  .lk-hint.on{ opacity:.85; }
   @keyframes hint{ 50%{ transform:translateY(-5px); } }
-  .homebar{ display:block; width:134px; height:5px; border-radius:3px; background:#fff; margin:10px auto 0; opacity:.9; }
+  @media (max-height:820px){ .lk-wid{ display:none; } }
+  @media (max-height:760px){ #s-lock .np{ display:none; } }
 
   /* home */
   #s-home{ z-index:6; display:flex; flex-direction:column; padding:calc(42px + var(--top)) 16px calc(10px + var(--bot)); }
@@ -164,14 +170,19 @@
   .badge{ position:absolute; top:-6px; left:calc(50% + 18px); min-width:22px; height:22px; padding:0 6px; border-radius:11px; background:#ff3b30; color:#fff;
     font:600 13px/22px var(--sys); text-align:center; box-shadow:0 2px 6px rgba(0,0,0,.25); transform:scale(0); transition:transform .35s cubic-bezier(.3,1.6,.5,1); }
   .ic.next .badge, .ic.always .badge{ transform:scale(1); }
-  .ic.next .ico{ animation:nudge 1.7s ease-in-out infinite; box-shadow:0 0 0 3px rgba(255,255,255,.75), 0 6px 18px rgba(0,0,0,.25); }
-  @keyframes nudge{ 0%,55%,100%{ transform:none; } 65%{ transform:rotate(-8deg) scale(1.08); } 75%{ transform:rotate(7deg) scale(1.08); } 85%{ transform:rotate(-3deg); } }
+  .ic.next .ico{ box-shadow:0 0 0 3px rgba(255,255,255,.8), 0 6px 18px rgba(0,0,0,.25); }
+  .chr{ width:38px; height:38px; border-radius:50%;
+    background:radial-gradient(circle, #4285f4 0 31%, #fff 32% 42%, transparent 43%), conic-gradient(from -60deg, #ea4335 0 120deg, #fbbc05 0 240deg, #34a853 0 360deg); }
   .ic.done .ico::after{ content:"✓"; position:absolute; right:-4px; bottom:-4px; width:20px; height:20px; border-radius:50%; background:#30d158; color:#fff;
     font:700 12px/20px var(--sys); text-align:center; box-shadow:0 2px 6px rgba(0,0,0,.25); }
   #phone.focus .ic.noisy .badge{ transform:scale(0); }
-  .hint{ margin:auto auto 12px; padding:11px 18px; border-radius:99px; background:rgba(255,255,255,.22); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
-    font:500 14.5px var(--sys); text-align:center; animation:hint 1.8s ease-in-out infinite; box-shadow:0 6px 20px rgba(20,0,40,.2); }
+  .hint{ display:flex; align-items:center; gap:10px; margin:auto auto 12px; padding:10px 16px; border-radius:99px; background:rgba(24,12,36,.42);
+    -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); font:500 14px var(--sys); text-align:center; box-shadow:0 6px 20px rgba(20,0,40,.2); }
   .hint b{ font-weight:700; }
+  .pd{ display:inline-flex; gap:4px; }
+  .pd i{ width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.35); }
+  .pd i.d{ background:#30d158; }
+  .pd i.c{ background:var(--cue); box-shadow:0 0 0 3px rgba(255,214,10,.3); }
   .dock{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; padding:12px 8px; border-radius:30px; background:rgba(255,255,255,.2);
     -webkit-backdrop-filter:blur(22px); backdrop-filter:blur(22px); }
   .dock .lbl{ display:none; }
@@ -203,7 +214,9 @@
   .app.open{ transform:none; opacity:1; border-radius:0; visibility:visible; transition:transform .5s cubic-bezier(.2,.85,.25,1), opacity .2s, border-radius .5s; }
   .app-hd{ position:relative; z-index:3; flex:none; display:flex; align-items:center; gap:10px; min-height:calc(86px + var(--top)); padding:calc(34px + var(--top)) 14px 8px;
     border-bottom:1px solid var(--sep); background:rgba(255,255,255,.94); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); }
-  .back{ flex:none; font:400 17px var(--sys); color:var(--blue); padding:8px 6px; min-width:44px; }
+  .back{ flex:none; width:44px; height:44px; margin:0 2px 0 -6px; border-radius:50%; display:grid; place-items:center; color:inherit; }
+  .back svg{ width:24px; height:24px; fill:currentColor; }
+  .back:active{ background:rgba(127,127,127,.18); }
   .hd-t{ font:700 17px var(--sys); }
   .app-bd{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:16px 16px calc(120px + var(--bot)); }
   .donebar{ position:absolute; z-index:5; left:0; right:0; bottom:0; padding:16px 20px calc(18px + var(--bot)); display:flex; justify-content:center;
@@ -212,9 +225,8 @@
   .donebar button{ pointer-events:auto; padding:15px 28px; border-radius:99px; background:#16121c; color:#fff; font:600 16px var(--sys);
     box-shadow:0 10px 30px rgba(0,0,0,.3); animation:breathe 1.9s ease-in-out infinite; }
   .donebar button::before{ content:"⌂  "; }
-  .more{ position:absolute; z-index:4; left:50%; bottom:calc(22px + var(--bot)); transform:translateX(-50%); padding:8px 14px; border-radius:99px;
-    background:rgba(20,16,28,.82); color:#fff; font:600 13px var(--sys); pointer-events:none; animation:hint 1.6s ease-in-out infinite; transition:opacity .4s; }
-  .more.off{ opacity:0; }
+  .vbadge{ position:absolute; left:10px; top:10px; padding:5px 10px; border-radius:99px; background:rgba(0,0,0,.55); color:#fff; font:700 11px var(--sys); letter-spacing:.06em;
+    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
   .pl{ position:absolute; left:50%; top:50%; width:58px; height:58px; margin:-29px 0 0 -29px; border-radius:50%; background:rgba(0,0,0,.42);
     -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); display:grid; place-items:center; color:#fff; font-size:22px; padding-left:4px;
     border:2px solid rgba(255,255,255,.75); animation:plp 1.6s ease-in-out infinite; }
@@ -231,46 +243,83 @@
   @keyframes popin{ from{ opacity:0; transform:scale(.6); } }
   .fadein{ animation:rise .6s cubic-bezier(.2,.8,.3,1) both; }
 
-  /* ---------- Team Body (messages) ---------- */
-  #a-msg .app-hd{ gap:8px; }
-  .gav{ display:flex; padding-left:8px; }
-  .gav span{ width:32px; height:32px; border-radius:50%; display:grid; place-items:center; font-size:16px; margin-left:-9px; border:2px solid #fff; background:#f2f2f7; }
-  .ttl b{ display:block; font:600 16px/1.2 var(--sys); }
-  .ttl small{ font:400 12.5px var(--sys); color:#8e8e93; }
-  .chat{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:10px 12px 18px; display:flex; flex-direction:column; gap:3px; }
+  /* ---------- Team Body (a WhatsApp-style group chat) ---------- */
+  #a-msg{ background:#efeae2; }
+  #a-msg .app-hd{ gap:8px; padding-right:6px; background:#008069; color:#fff; border:0; }
+  .wa-av{ width:40px; height:40px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:20px; background:#dfe5e7; }
+  .ttl{ flex:1; min-width:0; }
+  .ttl b{ display:block; font:600 17px/1.2 var(--sys); }
+  .ttl small{ display:block; font:400 13px/1.35 var(--sys); opacity:.88; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ttl small.typing{ font-style:italic; opacity:1; }
+  .wa-ic{ flex:none; width:38px; text-align:center; font-size:18px; }
+  .chat{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:8px 10px 16px; display:flex; flex-direction:column; gap:2px;
+    background:#efeae2 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg fill='none' stroke='%23e3dace' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='18' cy='20' r='7'/%3E%3Cpath d='M70 14l8 8m0-8l-8 8M20 78h16M28 70v16M62 92c4 6 14 6 18 0'/%3E%3Cpath d='M98 52c6-8 14 0 8 6l-8 8-8-8c-6-6 2-14 8-6z'/%3E%3Ccircle cx='100' cy='104' r='3'/%3E%3C/g%3E%3C/svg%3E"); }
   .chat > :first-child{ margin-top:auto; }
-  .day{ align-self:center; margin:14px 0 6px; font:600 11.5px var(--sys); color:#8e8e93; text-transform:uppercase; letter-spacing:.03em; }
-  .sys{ align-self:center; margin:10px 0 8px; padding:6px 11px; border-radius:10px; background:#f2f2f7; font:500 12.5px var(--sys); color:#6b6b70; animation:popin .4s both; }
-  .row{ display:flex; align-items:flex-end; gap:7px; max-width:86%; animation:bub .38s cubic-bezier(.2,.9,.3,1.25) both; }
-  @keyframes bub{ from{ opacity:0; transform:translateY(10px) scale(.9); } }
-  .row.in{ align-self:flex-start; }
+  .e2e{ align-self:center; max-width:90%; margin:4px 0 8px; padding:7px 12px; border-radius:8px; background:#ffeecd; color:#54656f; font:400 12.5px/1.45 var(--sys); text-align:center; }
+  .day{ align-self:center; margin:12px 0 6px; padding:5px 12px; border-radius:8px; background:#fff; color:#54656f; font:500 12px var(--sys); text-transform:uppercase; letter-spacing:.02em; box-shadow:0 1px .5px rgba(11,20,26,.13); }
+  .sys{ align-self:center; margin:8px 0; padding:6px 12px; border-radius:8px; background:#fff; color:#54656f; font:400 12.5px var(--sys); box-shadow:0 1px .5px rgba(11,20,26,.13); animation:popin .4s both; }
+  .row{ display:flex; align-items:flex-start; gap:6px; max-width:88%; animation:bub .35s cubic-bezier(.2,.9,.3,1.2) both; }
+  @keyframes bub{ from{ opacity:0; transform:translateY(10px) scale(.92); } }
+  .row.in{ align-self:flex-start; margin-top:6px; }
+  .row.in.cont{ margin-top:2px; }
   .row.out{ align-self:flex-end; margin-top:8px; }
-  .row .av{ width:28px; height:28px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:15px; background:#f2f2f7;
-    background:color-mix(in srgb, var(--c) 20%, #fff); }
+  .row.hasrx{ margin-bottom:15px; }
+  .row .av{ width:30px; height:30px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:15px; background:#fff;
+    background:color-mix(in srgb, var(--c) 22%, #fff); }
   .row.cont .av{ visibility:hidden; }
-  .nm{ display:block; font:600 11.5px var(--sys); color:var(--c); margin:8px 0 2px 11px; }
-  .bub{ position:relative; display:block; padding:9px 13px; border-radius:19px; font:400 16px/1.32 var(--sys); background:#e9e9eb; color:#111; overflow-wrap:anywhere; }
-  .row.out .bub{ background:linear-gradient(160deg,#ff8a7a,#ff6f9c); color:#fff; }
-  .rx{ position:absolute; top:-13px; right:-10px; padding:2px 7px; border-radius:12px; background:#fff; box-shadow:0 1px 5px rgba(0,0,0,.2); font:600 12px/1.4 var(--sys); color:#333;
+  .row .col{ display:flex; flex-direction:column; align-items:flex-start; min-width:0; }
+  .bub{ position:relative; display:block; padding:6px 9px 7px; border-radius:8px; background:#fff; color:#111b21; font:400 15.5px/1.38 var(--sys);
+    box-shadow:0 1px .5px rgba(11,20,26,.13); overflow-wrap:anywhere; }
+  .row.in:not(.cont) .bub{ border-top-left-radius:0; }
+  .row.in:not(.cont) .bub::before{ content:""; position:absolute; left:-8px; top:0; border-top:10px solid #fff; border-left:8px solid transparent; }
+  .row.out .bub{ background:#d9fdd3; border-top-right-radius:0; }
+  .row.out .bub::before{ content:""; position:absolute; right:-8px; top:0; border-top:10px solid #d9fdd3; border-right:8px solid transparent; }
+  .nm{ display:block; font:600 13px/1.3 var(--sys); color:var(--c); margin-bottom:1px; }
+  .bub .tx::after{ content:""; display:inline-block; width:58px; }
+  .row.out .bub .tx::after{ width:78px; }
+  .tm{ position:absolute; right:8px; bottom:4px; font:400 11px var(--sys); color:#667781; white-space:nowrap; }
+  .tk{ font-style:normal; color:#8696a0; letter-spacing:-3px; margin-left:2px; transition:color .3s; }
+  .tk.rd{ color:#53bdeb; }
+  .rx{ position:absolute; left:8px; bottom:-15px; padding:1px 7px; border-radius:12px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.2); font:500 12.5px/1.5 var(--sys); color:#333;
     animation:popin .4s cubic-bezier(.3,1.6,.5,1) both; white-space:nowrap; }
-  .bub.vid{ padding:0; width:168px; aspect-ratio:2/3; overflow:hidden; background:#000; border-radius:18px; }
-  .bub.vid img{ width:100%; height:100%; object-fit:cover; }
-  .du{ position:absolute; right:8px; bottom:8px; padding:2px 7px; border-radius:8px; background:rgba(0,0,0,.55); color:#fff; font:600 11px var(--sys); }
-  .bub.dots{ display:flex; gap:4px; padding:13px 14px; }
-  .bub.dots i{ width:7px; height:7px; border-radius:50%; background:#9a9aa0; animation:dot 1.2s infinite; }
-  .bub.dots i:nth-child(2){ animation-delay:.15s; } .bub.dots i:nth-child(3){ animation-delay:.3s; }
+  .bub.vid{ padding:3px; width:200px; }
+  .bub.vid .nm{ margin:3px 6px 4px; }
+  .vth{ position:relative; display:block; width:100%; aspect-ratio:2/3; border-radius:6px; overflow:hidden; background:#000; cursor:pointer; }
+  .vth img{ width:100%; height:100%; object-fit:cover; }
+  .vth .vt{ position:absolute; left:8px; right:8px; bottom:8px; padding:7px 8px; border-radius:99px; background:rgba(0,0,0,.6); color:#fff; font:700 13px var(--sys); text-align:center;
+    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+  .bub.vid .tm{ position:static; display:block; text-align:right; margin:3px 5px 0; }
+  .bub.vid.nudge{ animation:shake .45s; }
+  .bub.emo{ background:none; box-shadow:none; font-size:40px; line-height:1.1; padding:0 2px; }
+  .bub.emo::before{ display:none; }
+  .bub.emo .nm{ font-size:13px; line-height:1.3; }
+  .bub.emo .tx::after{ display:none; }
+  .bub.dots{ display:flex; flex-direction:column; align-items:flex-start; padding:7px 12px 9px; }
+  .dd{ display:flex; gap:4px; padding:5px 0 2px; }
+  .dd i{ width:7px; height:7px; border-radius:50%; background:#8696a0; animation:dot 1.2s infinite; }
+  .dd i:nth-child(2){ animation-delay:.15s; } .dd i:nth-child(3){ animation-delay:.3s; }
   @keyframes dot{ 0%,60%,100%{ transform:none; opacity:.5; } 30%{ transform:translateY(-4px); opacity:1; } }
-  .ff{ position:absolute; z-index:4; left:50%; top:calc(96px + var(--top)); transform:translateX(-50%); padding:7px 13px; border-radius:99px;
-    background:rgba(20,16,28,.78); color:#fff; font:500 12.5px var(--sys); white-space:nowrap; pointer-events:none; transition:opacity .6s; }
+  .ff{ position:absolute; z-index:4; left:50%; top:calc(96px + var(--top)); transform:translateX(-50%); width:max-content; max-width:90%; padding:8px 14px; border-radius:16px;
+    background:rgba(17,27,33,.85); color:#fff; font:500 13px/1.4 var(--sys); text-align:center; pointer-events:none; transition:opacity .6s; }
   .ff.off{ opacity:0; }
-  .compose{ flex:none; border-top:1px solid var(--sep); padding:8px 10px calc(8px + var(--bot)); background:#fff; }
-  .qr{ display:none; flex-wrap:wrap; justify-content:center; gap:8px; padding:2px 2px 9px; }
-  .qr.on{ display:flex; }
-  .qr button{ flex:none; padding:10px 15px; border-radius:99px; border:1.5px solid #ff7a8a; color:#f2456c; font:600 15px var(--sys); background:#fff3f6; animation:popin .4s both; }
-  .inp{ display:flex; align-items:center; gap:8px; }
-  .inp span{ flex:1; padding:9px 14px; border:1px solid #d1d1d6; border-radius:20px; color:#b0b0b6; font:400 16px var(--sys); }
-  .inp i{ width:32px; height:32px; border-radius:50%; background:#ff6f9c; color:#fff; display:grid; place-items:center; font:700 16px var(--sys); font-style:normal; }
-  #a-msg .donebar{ bottom:var(--cb, 58px); padding-bottom:10px; }
+  .newm{ position:absolute; z-index:4; right:12px; bottom:calc(var(--cb, 64px) + 12px); padding:9px 14px; border-radius:99px; background:#fff; color:#008069;
+    font:600 13.5px var(--sys); box-shadow:0 2px 8px rgba(0,0,0,.2); }
+  .compose{ flex:none; padding:6px 8px calc(8px + var(--bot)); }
+  .inp{ display:flex; align-items:center; gap:6px; }
+  .fld{ flex:1; min-width:0; display:flex; align-items:center; gap:10px; padding:11px 16px; border-radius:24px; background:#fff; color:#8696a0; font:400 16px var(--sys);
+    box-shadow:0 1px .5px rgba(11,20,26,.13); cursor:pointer; }
+  .fld b{ font-weight:400; }
+  .fld span{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; }
+  .inp.draft .fld{ color:#111b21; }
+  .inp.draft .fld span::after{ content:""; display:inline-block; width:2px; height:1.1em; margin-left:1px; vertical-align:-3px; background:#00a884; animation:caret 1s steps(1) infinite; }
+  @keyframes caret{ 50%{ opacity:0; } }
+  .snd{ width:46px; height:46px; border-radius:50%; flex:none; background:#00a884; color:#fff; display:grid; place-items:center; transition:transform .15s; }
+  .snd svg{ grid-area:1/1; width:23px; height:23px; fill:currentColor; transition:transform .25s, opacity .25s; }
+  .snd .arr{ opacity:0; transform:scale(.4) rotate(-30deg); }
+  .inp.ready .snd .mic{ opacity:0; transform:scale(.4); }
+  .inp.ready .snd .arr{ opacity:1; transform:none; }
+  .snd:active{ transform:scale(.9); }
+  #a-msg .donebar{ bottom:var(--cb, 64px); padding-bottom:10px; }
   #a-msg.fin .chat{ padding-bottom:78px; }
 
   /* ---------- Health ---------- */
@@ -321,7 +370,6 @@
   /* ---------- Pepero Express ---------- */
   #a-pep{ background:#fff7ef; }
   #a-pep .app-hd{ background:linear-gradient(135deg,#e0313f,#a5161f); color:#fff; border:0; }
-  #a-pep .back{ color:#fff; }
   .pp-brand{ font:800 19px/1.2 var(--round); }
   .pp-brand small{ display:block; font:500 12px var(--sys); opacity:.85; margin-top:2px; }
   .pp-hero{ padding:4px 2px 12px; }
@@ -469,7 +517,6 @@
   /* ---------- Notes ---------- */
   #a-notes{ background:#fffdf7; }
   #a-notes .app-hd{ background:rgba(255,253,247,.95); justify-content:space-between; }
-  #a-notes .back{ color:#d99a00; }
   .nt-ic{ color:#d99a00; font:700 20px var(--sys); padding:0 6px; }
   .nt-meta{ text-align:center; font:400 12.5px var(--sys); color:#8e8e93; margin:2px 0 16px; }
   .nt-title{ font:800 32px/1.15 var(--sys); color:#1c1c1e; min-height:38px; margin-bottom:10px; }
@@ -488,35 +535,32 @@
   .note-body .kill{ font-weight:700; }
   .note-body .kill b{ background:linear-gradient(transparent 60%, #ffe58a 60%); }
 
-  /* ---------- Control Center ---------- */
-  #cc{ position:absolute; inset:0; z-index:70; padding:calc(54px + var(--top)) 18px 20px; color:#fff;
-    background:rgba(14,8,22,.42); -webkit-backdrop-filter:blur(28px) saturate(1.3); backdrop-filter:blur(28px) saturate(1.3);
-    opacity:0; visibility:hidden; transform:translateY(-40px); transition:opacity .45s, transform .5s cubic-bezier(.2,.9,.3,1), visibility 0s linear .5s; }
+  /* ---------- Quick Settings (Android) ---------- */
+  #cc{ position:absolute; inset:0; z-index:70; padding:calc(50px + var(--top)) 16px 20px; color:#ece6f0;
+    background:rgba(18,13,24,.84); -webkit-backdrop-filter:blur(26px) saturate(1.2); backdrop-filter:blur(26px) saturate(1.2);
+    opacity:0; visibility:hidden; transform:translateY(-60px); transition:opacity .45s, transform .5s cubic-bezier(.2,.9,.3,1), visibility 0s linear .5s; }
   #cc.on{ opacity:1; visibility:visible; transform:none; transition:opacity .45s, transform .5s cubic-bezier(.2,.9,.3,1); }
-  .cc-hint{ font:600 16px var(--sys); text-align:center; margin-bottom:16px; animation:hint 1.8s ease-in-out infinite; }
-  .cc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:360px; margin:0 auto; }
-  .tile{ border-radius:24px; background:rgba(255,255,255,.15); padding:14px; }
-  .conn{ display:grid; grid-template-columns:1fr 1fr; gap:10px; justify-items:center; }
-  .conn i{ width:50px; height:50px; border-radius:50%; display:grid; place-items:center; font:600 20px var(--sys); font-style:normal; background:rgba(255,255,255,.18); }
-  .conn i.on{ background:#0a84ff; } .conn i.on2{ background:#30d158; }
-  .np2{ display:flex; flex-direction:column; justify-content:space-between; gap:8px; }
-  .np2 b{ font:600 13.5px/1.3 var(--sys); }
-  .np2 button{ align-self:flex-start; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.2); display:grid; place-items:center; font-size:16px; }
-  .focus-t{ grid-column:1 / -1; display:flex; align-items:center; gap:14px; padding:16px 18px; border-radius:24px; background:rgba(255,255,255,.15); transition:background .5s, color .5s;
-    animation:glow 1.8s ease-in-out infinite; }
-  @keyframes glow{ 50%{ box-shadow:0 0 0 5px rgba(190,170,255,.45); } }
-  .focus-t .m{ width:48px; height:48px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:23px; background:rgba(255,255,255,.2); transition:background .5s; }
-  .focus-t b{ display:block; font:600 18px var(--sys); }
-  .focus-t span span{ font:400 13.5px var(--sys); opacity:.8; }
-  .focus-t.on{ background:#fff; color:#4b2fbf; animation:none; }
-  .focus-t.on .m{ background:#5e3fe0; }
-  .sliders{ display:flex; gap:12px; justify-content:center; }
-  .sld{ position:relative; width:58px; height:132px; border-radius:20px; background:rgba(255,255,255,.18); overflow:hidden; }
-  .sld i{ position:absolute; left:0; right:0; bottom:0; background:#fff; }
-  .sld span{ position:absolute; left:0; right:0; bottom:10px; text-align:center; font-size:19px; }
-  .mini{ display:grid; grid-template-columns:1fr 1fr; gap:10px; justify-items:center; align-content:center; }
-  .mini i{ width:50px; height:50px; border-radius:16px; display:grid; place-items:center; font-size:21px; font-style:normal; background:rgba(255,255,255,.18); }
-  .cc-note{ max-width:360px; margin:16px auto 0; padding:14px 16px; border-radius:20px; background:rgba(255,255,255,.14); font:400 15px/1.55 var(--sys);
+  .cc-hint{ font:500 15px var(--sys); text-align:center; margin:0 0 14px; opacity:.9; }
+  .qs-bright{ position:relative; max-width:380px; height:46px; margin:0 auto 12px; border-radius:23px; background:#3a3342; overflow:hidden; }
+  .qs-bright i{ position:absolute; left:0; top:0; bottom:0; width:64%; border-radius:23px; background:#d7c4ff; }
+  .qs-bright span{ position:absolute; z-index:1; left:15px; top:50%; transform:translateY(-50%); font-size:17px; }
+  .qs-media{ display:flex; align-items:center; gap:12px; max-width:380px; margin:0 auto 12px; padding:10px 10px 10px 12px; border-radius:22px; background:#2e2836; }
+  .qs-media .tx{ flex:1; min-width:0; }
+  .qs-media b{ display:block; font:600 14px/1.25 var(--sys); }
+  .qs-media small{ font:400 12.5px var(--sys); opacity:.7; }
+  .qs-media button{ width:42px; height:42px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:16px; background:#d7c4ff; color:#23005c; }
+  .cc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:380px; margin:0 auto; }
+  .qt{ display:flex; align-items:center; gap:10px; min-height:64px; padding:10px 14px; border-radius:22px; background:#2e2836; color:#ece6f0; text-align:left; }
+  .qt .qi{ flex:none; width:24px; font-size:20px; text-align:center; }
+  .qt b{ display:block; font:600 14.5px/1.2 var(--sys); }
+  .qt small{ display:block; font:400 12.5px/1.25 var(--sys); opacity:.75; }
+  .qt.on{ background:#d7c4ff; color:#23005c; }
+  .focus-t{ grid-column:1 / -1; min-height:74px; padding:12px 18px; transition:background .5s, color .5s; }
+  .focus-t .qi{ font-size:24px; width:30px; }
+  .focus-t b{ font-size:17px; }
+  .focus-t small{ font-size:13.5px; }
+  .focus-t.on{ background:#fff; color:#4b2fbf; }
+  .cc-note{ max-width:380px; margin:14px auto 0; padding:14px 16px; border-radius:20px; background:rgba(255,255,255,.12); font:400 15px/1.55 var(--sys);
     opacity:0; transform:translateY(10px); transition:opacity .5s, transform .5s; }
   .cc-note.on{ opacity:1; transform:none; }
   .cc-note b{ font-weight:700; }
@@ -544,7 +588,10 @@
   .cap-box{ margin-top:26px; min-height:130px; max-width:330px; font:600 23px/1.42 var(--round); text-wrap:balance; opacity:0; transform:translateY(10px); transition:opacity .45s, transform .45s; }
   .cap-box.in{ opacity:1; transform:none; }
   .cap-box.dim{ font:500 17px/1.5 var(--sys); opacity:.85; }
-  .cap-tap{ font:500 12.5px var(--sys); opacity:.5; margin-top:6px; }
+  .cap-dots{ display:flex; gap:7px; justify-content:center; min-height:7px; }
+  .cap-dots i{ width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.28); transition:background .3s; }
+  .cap-dots i.on{ background:#fff; }
+  .cap-tap{ font:600 13.5px var(--sys); opacity:.72; margin-top:12px; }
   .cl-btns{ margin-top:auto; display:none; justify-content:space-around; width:100%; max-width:320px; }
   #s-call.ringing .ring-btns{ display:flex; }
   #s-call.canend .hang-btns{ display:flex; }
@@ -582,7 +629,11 @@
   #player.on{ opacity:1; visibility:visible; transition:opacity .3s; }
   .pl-box{ position:relative; width:86%; width:min(92cqw, calc((100cqh - 150px) * .6667)); aspect-ratio:2/3; }
   .pl-box video{ width:100%; height:100%; display:block; border-radius:20px; background:#000; object-fit:cover; }
-  .pl-x{ position:absolute; z-index:2; top:calc(16px + var(--top)); right:16px; width:42px; height:42px; border-radius:50%; background:rgba(255,255,255,.18); color:#fff; font:600 18px var(--sys); display:grid; place-items:center; }
+  .pl-x{ position:absolute; z-index:2; top:calc(14px + var(--top)); right:14px; height:40px; padding:0 16px; border-radius:99px; background:rgba(255,255,255,.2); color:#fff;
+    font:600 14.5px var(--sys); display:flex; align-items:center; gap:6px; }
+  .pl-prog{ position:absolute; left:14px; right:14px; bottom:14px; height:4px; border-radius:2px; background:rgba(255,255,255,.3); overflow:hidden; pointer-events:none; }
+  .pl-prog i{ display:block; height:100%; width:0; background:#fff; }
+  .pl-end.on #plDone{ animation:ringP 1.3s ease-out infinite; }
   .pl-end{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; border-radius:20px;
     background:rgba(0,0,0,.45); opacity:0; visibility:hidden; transition:.3s; }
   .pl-end.on{ opacity:1; visibility:visible; }
@@ -609,19 +660,40 @@
   .e3 b{ color:#fff; font-weight:600; }
   #eStay{ margin-top:18px; padding:10px 14px; font:500 13px var(--sys); color:#c9bcd6; text-decoration:underline; text-underline-offset:4px; }
 
+  /* ---------- coach: where the next tap goes ---------- */
+  #coach{ position:absolute; z-index:92; left:0; top:0; display:flex; flex-direction:column; align-items:center; cursor:pointer;
+    opacity:0; visibility:hidden; transition:opacity .25s, visibility 0s linear .25s; }
+  #coach.on{ opacity:1; visibility:visible; transition:opacity .25s; }
+  #coachHand{ height:38px; font-size:32px; line-height:38px; filter:drop-shadow(0 3px 5px rgba(0,0,0,.35)); animation:chU .9s ease-in-out infinite; }
+  #coach.above{ flex-direction:column-reverse; }
+  #coach.above #coachHand{ animation-name:chD; }
+  #coach.right{ flex-direction:row; gap:2px; }
+  #coach.right #coachHand{ animation-name:chL; }
+  #coach.left{ flex-direction:row-reverse; gap:2px; }
+  #coach.left #coachHand{ animation-name:chR; }
+  #coach.down #coachHand, #coach.up #coachHand{ display:none; }
+  #coachLbl{ padding:8px 15px; border-radius:99px; background:var(--cue); color:#1d1600; font:700 14.5px/1.25 var(--sys); white-space:nowrap;
+    box-shadow:0 6px 18px rgba(0,0,0,.28), 0 0 0 2px rgba(255,255,255,.7); }
+  #coach.down #coachLbl, #coach.up #coachLbl{ animation:hint 1.4s ease-in-out infinite; }
+  @keyframes chU{ 50%{ transform:translateY(-7px); } }
+  @keyframes chD{ 50%{ transform:translateY(7px); } }
+  @keyframes chL{ 50%{ transform:translateX(-7px); } }
+  @keyframes chR{ 50%{ transform:translateX(7px); } }
+  #coachRing{ position:absolute; z-index:91; left:0; top:0; border:3px solid var(--cue); pointer-events:none; opacity:0; transition:opacity .25s; }
+  #coachRing.on{ opacity:1; animation:ringP 1.3s ease-out infinite; }
+  @keyframes ringP{ 0%{ box-shadow:0 0 0 0 rgba(255,214,10,.75); } 100%{ box-shadow:0 0 0 14px rgba(255,214,10,0); } }
+
   /* ---------- small bits ---------- */
   #sb.lock #sbTime{ visibility:hidden; }
   #s-lock{ touch-action:none; }
   .ic.no .ico{ animation:shake .45s; }
   .photo-cap{ text-align:center; }
-  .row .col{ display:flex; flex-direction:column; align-items:flex-start; min-width:0; }
-  .bub.vid{ cursor:pointer; }
-  .bub.emo{ background:none; font-size:38px; line-height:1.1; padding:0 2px; }
   [data-toast]{ cursor:pointer; }
   @media (max-height:660px){
     .lk-wid, .lk-lock{ display:none; }
-    .lk-time{ margin-bottom:12px; }
-    .nt{ padding:7px 12px; }
+    .lk-time{ font-size:64px; margin-bottom:6px; }
+    .nt{ padding:8px 12px; } .nt .ai{ width:28px; height:28px; font-size:15px; }
+    .fp{ width:56px; height:56px; margin-top:10px; } .fp svg{ width:30px; height:30px; }
   }
 </style>
 </head>
@@ -636,6 +708,12 @@
       <path d="M60 20V31" stroke="#f0cd96" stroke-width="13" stroke-linecap="round" fill="none"/>
       <path d="M60 31V60a16 16 0 0 1-32 0" stroke="#5c3222" stroke-width="13" stroke-linecap="round" fill="none"/>
       <path d="M56 37V58" stroke="#8c583e" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+    </symbol>
+    <symbol id="backS" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></symbol>
+    <symbol id="sendS" viewBox="0 0 24 24"><path d="M3.4 20.4l17.45-7.48c.81-.35.81-1.49 0-1.84L3.4 3.6c-.66-.29-1.39.2-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"/></symbol>
+    <symbol id="micS" viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></symbol>
+    <symbol id="fpS" viewBox="0 0 24 24">
+      <path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.72c-.1 0-.2-.03-.29-.09-.23-.16-.28-.47-.12-.7.99-1.4 2.25-2.5 3.75-3.27C9.98 4.04 14 4.03 17.15 5.65c1.5.77 2.76 1.86 3.75 3.25.16.22.11.54-.12.7-.23.16-.54.11-.7-.12-.9-1.26-2.04-2.25-3.39-2.94-2.87-1.47-6.54-1.47-9.4.01-1.36.7-2.5 1.7-3.4 2.96-.08.14-.23.21-.39.21zm6.25 12.07c-.13 0-.26-.05-.35-.15-.87-.87-1.34-1.43-2.01-2.64-.69-1.23-1.05-2.73-1.05-4.34 0-2.97 2.54-5.39 5.66-5.39s5.66 2.42 5.66 5.39c0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-2.42-2.09-4.39-4.66-4.39-2.57 0-4.66 1.97-4.66 4.39 0 1.44.32 2.77.93 3.85.64 1.15 1.08 1.64 1.85 2.42.19.2.19.51 0 .71-.11.1-.24.15-.37.15zm7.17-1.85c-1.19 0-2.24-.3-3.1-.89-1.49-1.01-2.38-2.65-2.38-4.39 0-.28.22-.5.5-.5s.5.22.5.5c0 1.41.72 2.74 1.94 3.56.71.48 1.54.71 2.54.71.24 0 .64-.03 1.04-.1.27-.05.53.13.58.41.05.27-.13.53-.41.58-.57.11-1.07.12-1.21.12zM14.91 22c-.04 0-.09-.01-.13-.02-1.59-.44-2.63-1.03-3.72-2.1-1.4-1.39-2.17-3.24-2.17-5.22 0-1.62 1.38-2.94 3.08-2.94 1.7 0 3.08 1.32 3.08 2.94 0 1.07.93 1.94 2.08 1.94s2.08-.87 2.08-1.94c0-3.77-3.25-6.83-7.25-6.83-2.84 0-5.44 1.58-6.61 4.03-.39.81-.59 1.76-.59 2.8 0 .78.07 2.01.67 3.61.1.26-.03.55-.29.64-.26.1-.55-.04-.64-.29-.49-1.31-.73-2.61-.73-3.96 0-1.2.23-2.29.68-3.24 1.33-2.79 4.28-4.6 7.51-4.6 4.55 0 8.25 3.51 8.25 7.83 0 1.62-1.38 2.94-3.08 2.94s-3.08-1.32-3.08-2.94c0-1.07-.93-1.94-2.08-1.94s-2.08.87-2.08 1.94c0 1.71.66 3.31 1.87 4.51.95.94 1.86 1.46 3.27 1.85.27.07.42.35.35.61-.05.23-.26.38-.47.38z"/>
     </symbol>
     <symbol id="phoneS" viewBox="0 0 24 24">
       <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
@@ -657,7 +735,7 @@
 
   <!-- ============ software update ============ -->
   <section id="s-update" class="screen on">
-    <div class="up-nav"><span class="bk">‹ General</span><span>Software Update</span><span></span></div>
+    <div class="up-nav"><button class="back" aria-label="Back" data-toast="No going back now 😌"><svg><use href="#backS"/></svg></button><span>System update</span></div>
     <div class="up-scroll">
       <div class="up-card">
         <div class="up-head">
@@ -681,9 +759,9 @@
       </div>
     </div>
     <div class="up-act">
-      <button class="btn-primary" id="bInstall">Install Now</button>
-      <button class="btn-text" id="bLater">Remind Me Tomorrow</button>
-      <p class="up-sound">🔊 Sound on for this one</p>
+      <button class="btn-primary" id="bInstall">Install now</button>
+      <button class="btn-text" id="bLater">Remind me tomorrow</button>
+      <p class="up-sound">🔊 Volume up · takes about 8 minutes</p>
     </div>
   </section>
 
@@ -694,14 +772,15 @@
       <div class="bar"><i id="insBar"></i></div>
       <p id="insMsg">Preparing update…</p>
       <p id="insEta"></p>
+      <p class="ins-sit">Sit back. This part plays by itself 🍿</p>
     </div>
   </section>
 
   <!-- ============ lock screen ============ -->
   <section id="s-lock" class="screen">
     <div class="lk-lock">🔒</div>
-    <div class="lk-date" id="lkDate"></div>
     <div class="lk-time" id="lkTime">9:41</div>
+    <div class="lk-date" id="lkDate"></div>
     <div class="lk-wid"><span class="wpill">🏃‍♀️ 14 km</span><span class="wpill">🩹 healing</span><span class="wpill">🍫 3%</span></div>
     <div class="lk-notifs" id="lkNotifs"></div>
     <div class="np">
@@ -709,8 +788,8 @@
       <div class="tx"><b>lo-fi beats to heal to</b><span>JessOS Radio</span></div>
       <button data-music aria-label="Play or pause the music">❚❚</button>
     </div>
-    <div class="lk-hint hide" id="lkHint">Swipe up (with the good hand) ✋</div>
-    <i class="homebar"></i>
+    <button class="fp" id="lkFp" aria-label="Unlock"><svg viewBox="0 0 24 24"><use href="#fpS"/></svg></button>
+    <p class="lk-hint" id="lkHint">Good hand only ✋</p>
   </section>
 
   <!-- ============ home screen ============ -->
@@ -740,34 +819,36 @@
       <div><span class="br" id="bwPep" style="--p:3;--c:#ff453a">🍫</span><b id="bwPepT">3%</b></div>
       <div><span class="br" style="--p:100;--c:#30d158">🏃‍♂️</span><b>100%</b></div>
     </div>
-    <div class="hint" id="hint">Tap the bouncing app 👆</div>
+    <button class="hint" id="hint"></button>
     <div class="dock" style="--i:13">
       <button class="ic" data-app="phone"><span class="ico" style="--bg:linear-gradient(160deg,#6ff29a,#1fc257)">📞</span><span class="lbl">Phone</span></button>
       <button class="ic noisy always" data-app="mail"><span class="ico" style="--bg:linear-gradient(160deg,#5ac8fa,#0a6cff)">✉️</span><span class="lbl">Mail</span><span class="badge">999+</span></button>
-      <button class="ic" data-app="safari"><span class="ico" style="--bg:#fff">🧭</span><span class="lbl">Safari</span></button>
+      <button class="ic" data-app="chrome"><span class="ico" style="--bg:#fff"><i class="chr"></i></span><span class="lbl">Chrome</span></button>
       <button class="ic" data-app="music"><span class="ico" style="--bg:linear-gradient(160deg,#ff6b88,#fa2d48)">🎵</span><span class="lbl">Music</span></button>
     </div>
   </section>
 
   <!-- ============ app: Team Body (group chat) ============ -->
-  <section class="app" id="a-msg" data-sb="dark">
+  <section class="app" id="a-msg" data-sb="light" data-theme="#008069">
     <header class="app-hd">
-      <button class="back" data-close>‹ Home</button>
-      <div class="gav"><span>🤚</span><span>🦵</span><span>🧠</span></div>
-      <div class="ttl"><b>Team Body 🫶</b><small id="msgSub">8 members</small></div>
+      <button class="back" data-close aria-label="Back"><svg><use href="#backS"/></svg></button>
+      <span class="wa-av">🩹</span>
+      <div class="ttl"><b>Team Body</b><small id="msgSub">Hand, Fingers, Palm, Knee, Legs, Brain, Heart, Tummy</small></div>
+      <span class="wa-ic" data-toast="Video call? Hand is camera-shy today 🙈">📹</span>
+      <span class="wa-ic" data-toast="Group call? Knee would complain the whole time 🙄">📞</span>
     </header>
-    <div class="ff off" id="msgFF">Tap anywhere to speed up ⏩</div>
-    <div class="chat" id="chat"></div>
+    <div class="ff off" id="msgFF">Messages arrive by themselves.<br>Tap anywhere to go faster ⏩</div>
+    <div class="chat" id="chat"><p class="e2e">🔒 Messages in this group are end-to-end embarrassing. Nobody outside Team Body can read them.</p></div>
+    <button class="newm hide" id="newM">↓ New messages</button>
     <div class="compose">
-      <div class="qr" id="qr"></div>
-      <div class="inp"><span>iMessage</span><i>↑</i></div>
+      <div class="inp"><div class="fld" id="draft"><b>😊</b><span id="draftTx">Message</span></div><button class="snd" id="send" aria-label="Send"><svg class="mic"><use href="#micS"/></svg><svg class="arr"><use href="#sendS"/></svg></button></div>
     </div>
     <div class="donebar"><button data-close>Back to home</button></div>
   </section>
 
   <!-- ============ app: Health ============ -->
-  <section class="app" id="a-health" data-sb="dark">
-    <header class="app-hd"><button class="back" data-close>‹ Home</button><span class="hd-t">Health</span></header>
+  <section class="app" id="a-health" data-sb="dark" data-theme="#f2f2f7">
+    <header class="app-hd"><button class="back" data-close aria-label="Back"><svg><use href="#backS"/></svg></button><span class="hd-t">Health</span></header>
     <div class="app-bd" id="hBd">
       <div class="h-title"><div><h1>Summary</h1><p id="hDay">Recovery mode</p></div><img src="media/face.jpg" alt=""></div>
 
@@ -781,7 +862,7 @@
       </div>
 
       <div class="hc" style="--c:#ff6b9a" data-toast="Palm says thanks for asking 🎈">
-        <div class="hh">🫴 Palm swelling <span>Going down</span></div>
+        <div class="hh">✋ Palm swelling <span>Going down</span></div>
         <div class="mv">
           <div class="big sm">Puffy → less puffy</div>
           <svg class="spark" viewBox="0 0 112 42"><path d="M4 6C22 5 30 13 44 18S70 30 84 33 102 37 108 38"/></svg>
@@ -840,12 +921,11 @@
       <p class="real">Real note: keep it clean, keep it covered, and please see a doctor if it gets worse 💛</p>
       <button class="cta" id="hCta">Order a Pepero refill 🍫</button>
     </div>
-    <div class="more" id="hMore">Scroll ↓</div>
   </section>
 
   <!-- ============ app: Pepero Express ============ -->
-  <section class="app" id="a-pep" data-sb="light">
-    <header class="app-hd"><button class="back" data-close>‹ Home</button><div class="pp-brand">🍫 Pepero Express<small>Order #1111 · because the sticks look like 1s</small></div></header>
+  <section class="app" id="a-pep" data-sb="light" data-theme="#c81d2e">
+    <header class="app-hd"><button class="back" data-close aria-label="Back"><svg><use href="#backS"/></svg></button><div class="pp-brand">🍫 Pepero Express<small>Order #1111 · because the sticks look like 1s</small></div></header>
     <div class="app-bd" id="pepBd">
       <div id="pepCart">
         <div class="pp-hero"><b>Emergency refill</b><span>for one very brave hand</span></div>
@@ -887,10 +967,9 @@
       <div id="pepDone" class="hide">
         <p class="pp-d">Delivered! 🎉</p>
         <button class="box" id="pepBox" aria-label="Open the box"><span class="inside"><i></i><i class="alm"></i><i></i><i class="wht"></i><i></i><i class="alm"></i></span><span class="lid"><span class="bow"></span></span><span class="base"><span>PEPERO</span></span></button>
-        <p class="tapme" id="pepTap">Tap the box to open 👆</p>
         <div id="pepAfter" class="hide">
           <p class="pp-ok">Pepero levels restored: 100% 🔋</p>
-          <button class="vcard" data-v="pepero"><img src="media/pepero.jpg" alt=""><span class="pl">▶</span><span class="cap">Proof of delivery · 0:10</span></button>
+          <button class="vcard" data-v="pepero"><img src="media/pepero.jpg" alt=""><span class="vbadge">🎥 VIDEO</span><span class="pl">▶</span><span class="cap">Proof of delivery · 0:10</span></button>
           <p class="pp-rate">Rider rating: ★★★★★<small>(pre-filled, you're welcome)</small></p>
         </div>
       </div>
@@ -899,8 +978,8 @@
   </section>
 
   <!-- ============ app: Stride ============ -->
-  <section class="app" id="a-stride" data-sb="dark">
-    <header class="app-hd"><button class="back" data-close>‹ Home</button><span class="st-logo">STRIDE</span></header>
+  <section class="app" id="a-stride" data-sb="dark" data-theme="#ffffff">
+    <header class="app-hd"><button class="back" data-close aria-label="Back"><svg><use href="#backS"/></svg></button><span class="st-logo">STRIDE</span></header>
     <div class="app-bd" id="stBd">
       <div class="ath"><img src="media/face.jpg" alt=""><div><b>Jess</b><span>Sunday · Morning Run</span></div><em>🔥 Hard Mode</em></div>
       <h2 class="st-title">Sunday Morning Run</h2>
@@ -923,7 +1002,7 @@
       </div>
       <div class="wk">This weekend: <b>2 runs · 14 km · 1 bandaged hand</b></div>
       <h3 class="st-h">Highlight reel</h3>
-      <button class="vcard" data-v="run10k"><img src="media/run10k.jpg" alt=""><span class="pl">▶</span><span class="cap">10K, with commentary · 0:11</span></button>
+      <button class="vcard" data-v="run10k"><img src="media/run10k.jpg" alt=""><span class="vbadge">🎥 VIDEO</span><span class="pl">▶</span><span class="cap">10K, with commentary · 0:11</span></button>
       <h3 class="st-h">Post-run photo</h3>
       <div class="photo"><img src="media/starfish.jpg" alt="Post-run cooldown"></div>
       <p class="photo-cap">Post-run cooldown, as recommended by Knee.</p>
@@ -940,15 +1019,14 @@
       <button class="btn-st" id="stKudos">Give yourself kudos 👍</button>
       <p class="kd-msg" id="stMsg">Kudos received. From you, to you. Long overdue.</p>
     </div>
-    <div class="more" id="stMore">Scroll ↓</div>
     <div class="donebar"><button data-close>Back to home</button></div>
   </section>
 
   <!-- ============ app: SplitLoad ============ -->
-  <section class="app" id="a-split" data-sb="dark">
-    <header class="app-hd"><button class="back" data-close>‹ Home</button><div class="sl-logo">⚖️ SplitLoad<small>You &amp; Running Buddy</small></div></header>
+  <section class="app" id="a-split" data-sb="dark" data-theme="#f3faf7">
+    <header class="app-hd"><button class="back" data-close aria-label="Back"><svg><use href="#backS"/></svg></button><div class="sl-logo">⚖️ SplitLoad<small>You &amp; Running Buddy</small></div></header>
     <div class="app-bd" id="slBd">
-      <button class="vrow" data-v="monday"><span class="th"><img src="media/monday.jpg" alt=""><span class="pl sm">▶</span></span><span><b>Live from your Monday</b><small>0:11 · watch this first</small></span></button>
+      <button class="vrow" data-v="monday"><span class="th"><img src="media/monday.jpg" alt=""><span class="pl sm">▶</span></span><span><b>Live from your Monday</b><small>🎥 Video · 0:11 · tap to watch</small></span></button>
       <p class="sl-intro">This week's load is a little uneven. <b>Tap anything on your plate</b> to send it his way.</p>
       <div class="bal"><i id="balMe"></i><u id="balHim"></u></div>
       <div class="bal-l"><span>You</span><span>Running Buddy</span></div>
@@ -961,8 +1039,8 @@
   </section>
 
   <!-- ============ app: Notes ============ -->
-  <section class="app" id="a-notes" data-sb="dark">
-    <header class="app-hd"><button class="back" data-close>‹ Notes</button><span class="nt-ic">⋯</span></header>
+  <section class="app" id="a-notes" data-sb="dark" data-theme="#fffdf7">
+    <header class="app-hd"><button class="back" data-close aria-label="Back"><svg><use href="#backS"/></svg></button><span class="nt-ic">⋮</span></header>
     <div class="app-bd" id="ntBd">
       <p class="nt-meta">Shared by 🏃‍♂️ Running Buddy · Edited Sunday, after 10 km</p>
       <h1 class="nt-title"><span id="ntT"></span><i class="caret"></i></h1>
@@ -981,22 +1059,24 @@
     <div class="donebar"><button data-close>Back to home</button></div>
   </section>
 
-  <!-- ============ Control Center ============ -->
+  <!-- ============ Quick Settings ============ -->
   <div id="cc">
-    <p class="cc-hint" id="ccHint">Tap <b>Rest Focus</b> 🌙</p>
+    <p class="cc-hint" id="ccHint">One last setting before you go 🌙</p>
+    <div class="qs-bright"><i></i><span>☀️</span></div>
+    <div class="qs-media"><div class="art">🎧</div><div class="tx"><b>lo-fi beats to heal to</b><small>JessOS Radio</small></div><button data-music aria-label="Play or pause the music">❚❚</button></div>
     <div class="cc-grid">
-      <div class="tile conn"><i>✈️</i><i class="on2">📶</i><i class="on">🌐</i><i class="on">🎧</i></div>
-      <div class="tile np2"><b>lo-fi beats to heal to</b><button data-music aria-label="Play or pause the music">❚❚</button></div>
-      <button class="focus-t" id="focusTile"><span class="m">🌙</span><span><b>Rest Focus</b><span id="focusSt">Off</span></span></button>
-      <div class="tile sliders"><div class="sld"><i style="height:62%"></i><span>☀️</span></div><div class="sld"><i style="height:45%"></i><span>🔊</span></div></div>
-      <div class="tile mini"><i>🔦</i><i>⏱️</i><i>🧮</i><i>📷</i></div>
+      <button class="qt on" data-toast="Connected to JessNet. Strong signal, as usual 📶"><span class="qi">📶</span><span><b>Internet</b><small>JessNet</small></span></button>
+      <button class="qt on" data-toast="Connected to Running Buddy's earbuds. He brought spares 🎧"><span class="qi">🎧</span><span><b>Bluetooth</b><small>Earbuds</small></span></button>
+      <button class="qt" data-toast="Torch stays off. You're bright enough already 🔦"><span class="qi">🔦</span><span><b>Torch</b><small>Off</small></span></button>
+      <button class="qt on" data-toast="Battery saver: Pepero mode. Snacks prioritised 🍫"><span class="qi">🔋</span><span><b>Battery saver</b><small>Pepero mode</small></span></button>
+      <button class="qt focus-t" id="focusTile"><span class="qi">🌙</span><span><b>Rest Focus</b><small id="focusSt">Off</small></span></button>
     </div>
     <div class="cc-note" id="ccNote">Rest Focus is on.<br><b>Silenced:</b> work, deadlines and overthinking.<br><b>Allowed:</b> Pepero, sleep, Bridgerton and your people.</div>
   </div>
 
   <!-- ============ the call ============ -->
   <section id="s-call" class="screen">
-    <p class="cl-lbl" id="clLbl">incoming call</p>
+    <p class="cl-lbl" id="clLbl">Incoming call</p>
     <div class="cl-av">🏃‍♂️</div>
     <p class="cl-name">Running Buddy</p>
     <p class="cl-sub" id="clSub">allowed during Rest Focus 🌙</p>
@@ -1004,11 +1084,12 @@
       <div class="wave" id="wave"><i style="--d:.1"></i><i style="--d:.5"></i><i style="--d:.25"></i><i style="--d:.65"></i><i style="--d:.05"></i><i style="--d:.4"></i><i style="--d:.6"></i><i style="--d:.2"></i><i style="--d:.45"></i></div>
       <div class="vn"><span>▶</span><div class="pbar2"><i id="vnBar"></i></div><span id="vnT">0:00</span></div>
       <p class="cap-box" id="cap"></p>
-      <p class="cap-tap hide" id="capTap">tap to continue</p>
+      <div class="cap-dots" id="capDots"></div>
+      <p class="cap-tap hide" id="capTap">Tap anywhere to continue ›</p>
     </div>
     <div class="cl-btns ring-btns">
       <button class="cbtn dec" id="bDecline"><i><svg><use href="#phoneS"/></svg></i>Decline</button>
-      <button class="cbtn acc" id="bAccept"><i><svg><use href="#phoneS"/></svg></i>Accept</button>
+      <button class="cbtn acc" id="bAccept"><i><svg><use href="#phoneS"/></svg></i>Answer</button>
     </div>
     <div class="cl-btns hang-btns">
       <button class="cbtn dec" id="bHang"><i><svg><use href="#phoneS"/></svg></i><span id="hangLbl">End</span></button>
@@ -1035,13 +1116,16 @@
 
   <!-- ============ video player + toast ============ -->
   <div id="player">
-    <button class="pl-x" id="plX" aria-label="Close">✕</button>
+    <button class="pl-x" id="plX" aria-label="Close">✕ Close</button>
     <div class="pl-box">
       <video id="vid" playsinline webkit-playsinline preload="none"></video>
-      <div class="pl-end" id="plEnd"><button id="plAgain">↺ Watch again</button><button id="plDone">Done</button></div>
+      <div class="pl-prog"><i id="plProg"></i></div>
+      <div class="pl-end" id="plEnd"><button id="plDone">✓ Done</button><button id="plAgain">↺ Watch again</button></div>
       <button class="pl-tap" id="plTap">▶ Tap to play</button>
     </div>
   </div>
+  <div id="coachRing"></div>
+  <div id="coach" aria-hidden="true"><span id="coachHand">👆</span><span id="coachLbl"></span></div>
   <div id="toast"></div>
 
   <div id="escape" hidden>
@@ -1072,6 +1156,9 @@
     if (html != null) e.innerHTML = html;
     return e;
   }
+  const buzz = (p) => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
+  const themeMeta = $('meta[name="theme-color"]');
+  const setTheme = (c) => { if (c && themeMeta.getAttribute("content") !== c) themeMeta.setAttribute("content", c); };
   /* a wait that a tap on `node` cuts short (ignores the tap that started it) */
   function makePauser(node){
     let skip = null, since = 0;
@@ -1094,7 +1181,9 @@
       : `x-safari-https://${here}`;
     out.textContent = ANDROID ? "Open in Chrome ›" : "Open in Safari ›";
     $("#eWhere").textContent = ANDROID ? "Chrome" : "Safari";
-    $("#eIos").hidden = ANDROID;
+    $("#eIos").innerHTML = ANDROID
+      ? "If nothing happens, tap <b>⋮</b> at the top right, then <b>Open in Chrome</b>."
+      : "If nothing happens, tap <b>•••</b> at the top right, then <b>Open in external browser</b>.";
     $("#escape").hidden = false;
     $("#eStay").addEventListener("click", () => { $("#escape").hidden = true; prepMusic(); });
     setTimeout(() => out.click(), 250);
@@ -1135,7 +1224,11 @@
   }
   battery(3);
 
-  function show(id){ $$(".screen").forEach((s) => s.classList.toggle("on", s.id === id)); }
+  const THEME = { "s-update": "#fdf8fc", "s-install": "#000000", "s-lock": "#3b1d4b", "s-home": "#3b1d4b", "s-call": "#3a2458", "s-end": "#ffe2da" };
+  function show(id){
+    $$(".screen").forEach((s) => s.classList.toggle("on", s.id === id));
+    refreshCue();
+  }
 
   let toastT = 0;
   function toast(msg, ms = 2700){
@@ -1273,6 +1366,16 @@
   music.loop = true; music.preload = "auto"; music.setAttribute("playsinline", "");
   let musicReady = false, wantMusic = false;
   const hold = new Set();
+  function mediaInfo(title, onPlay, onPause){
+    if (!("mediaSession" in navigator) || !window.MediaMetadata) return;
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({ title, artist: "JessOS Radio", album: "JessOS 26.11",
+        artwork: [{ src: new URL("media/face.jpg", location.href).href, sizes: "256x256", type: "image/jpeg" }] });
+      navigator.mediaSession.setActionHandler("play", onPlay);
+      navigator.mediaSession.setActionHandler("pause", onPause);
+    } catch (e) {}
+  }
+  mediaInfo("lo-fi beats to heal to", () => playMusic(), () => pauseMusic());
   function prepMusic(){
     if (MUTE || musicReady) return;
     renderMusic().then((blob) => {
@@ -1395,29 +1498,41 @@
 
   /* ============================================================ video player */
   const VDUR = { friday: "0:10", run10k: "0:11", monday: "0:11", pepero: "0:10" };
-  const vid = $("#vid"), player = $("#player");
-  let videoOpen = false;
+  const VTITLE = { friday: "Friday, 11:52 pm", run10k: "10K, with commentary", monday: "Live from your Monday", pepero: "Proof of delivery" };
+  const vid = $("#vid"), player = $("#player"), plTap = $("#plTap"), plProg = $("#plProg"), watched = new Set();
+  let videoOpen = false, curVid = "";
   function openVideo(name){
-    videoOpen = true;
+    videoOpen = true; curVid = name;
     hold.add("video"); syncMusic();
-    $("#plEnd").classList.remove("on"); $("#plTap").classList.remove("on");
+    $("#plEnd").classList.remove("on"); plTap.classList.remove("on"); plProg.style.width = "0";
     vid.poster = `media/${name}.jpg`;
     vid.src = `media/${name}.mp4`;
     vid.muted = MUTE;
     player.classList.add("on");
+    mediaInfo(VTITLE[name], () => vid.play().catch(() => {}), () => vid.pause());
     const p = vid.play();
-    if (p && p.catch) p.catch(() => $("#plTap").classList.add("on"));
+    if (p && p.catch) p.catch(() => { plTap.textContent = "▶ Tap to play"; plTap.classList.add("on"); });
+    refreshCue();
   }
   function closeVideo(){
+    videoOpen = false;
     vid.pause();
     player.classList.remove("on");
-    videoOpen = false;
+    if (curVid){
+      watched.add(curVid);
+      $$(`[data-v="${curVid}"] .vt`).forEach((n) => (n.textContent = "↺ Watch again"));
+    }
     hold.delete("video"); syncMusic();
+    mediaInfo("lo-fi beats to heal to", () => playMusic(), () => pauseMusic());
+    refreshCue();
   }
-  vid.addEventListener("ended", () => $("#plEnd").classList.add("on"));
+  vid.addEventListener("timeupdate", () => { if (vid.duration) plProg.style.width = (vid.currentTime / vid.duration) * 100 + "%"; });
+  vid.addEventListener("ended", () => { plProg.style.width = "100%"; $("#plEnd").classList.add("on"); });
+  vid.addEventListener("pause", () => { if (videoOpen && !vid.ended && vid.currentTime > 0){ plTap.textContent = "▶ Tap to resume"; plTap.classList.add("on"); } });
+  vid.addEventListener("play", () => plTap.classList.remove("on"));
   vid.addEventListener("error", () => { if (videoOpen) toast("That video didn't load. Try again in a moment?"); });
   vid.addEventListener("click", () => { if (vid.paused) vid.play().catch(() => {}); else vid.pause(); });
-  $("#plTap").addEventListener("click", () => { $("#plTap").classList.remove("on"); vid.play().catch(() => {}); });
+  plTap.addEventListener("click", () => { plTap.classList.remove("on"); vid.play().catch(() => {}); });
   $("#plAgain").addEventListener("click", () => { $("#plEnd").classList.remove("on"); vid.currentTime = 0; vid.play().catch(() => {}); });
   $("#plDone").addEventListener("click", closeVideo);
   $("#plX").addEventListener("click", closeVideo);
@@ -1458,36 +1573,41 @@
     for (const [msg, pct, eta] of STEPS){
       $("#insMsg").textContent = msg; $("#insEta").textContent = eta; $("#insBar").style.width = pct + "%";
       sfx.tick();
-      await insWait(1500);
+      await insWait(1100);
     }
     $("#s-install").classList.add("boot");
     sfx.boot();
-    await wait(1900);
+    await wait(1500);
     toLock();
   }
 
   /* ============================================================ lock screen */
   const NOTIFS = [
-    ["Team Body", "#34c759", "💬", "Hand", "guys… quick update 🙃", "Fri"],
-    ["Pepero Express", "#d7263d", "🍫", "Low Pepero warning", "Levels look critically low. Shall we fix that?", "Sat"],
+    ["Team Body", "#25d366", "💬", "Hand", "guys… quick update 🙃", "Fri"],
+    ["Pepero Express", "#d7263d", "🍫", "Low Pepero warning", "Levels critically low. Shall we fix that?", "Sat"],
     ["Stride", "#fc5200", "🏃‍♀️", "Weekend summary ready", "Prepare to be smug.", "Sun"],
-    ["SplitLoad", "#13a985", "⚖️", "Running Buddy", "wants to split your week with you", "9m ago"],
+    ["SplitLoad", "#13a985", "⚖️", "Running Buddy", "wants to split your week with you", "9m"],
     ["Notes", "#e0a100", "📝", "Shared note", "“jessness” was edited", "now"],
   ];
   const lock = $("#s-lock");
-  let unlocked = false, lockArmed = false, px = 0, py = 0;
+  let unlocked = false, lockArmed = false, lockReady = false, px = 0, py = 0;
   async function toLock(){
     show("s-lock"); sb.classList.add("on", "lock"); sbMode(false);
     const box = $("#lkNotifs");
-    setTimeout(() => $("#lkHint").classList.remove("hide"), 2600);
+    await wait(600);
     for (const [app, c, ic, title, body, when] of NOTIFS){
-      await wait(850);
       if (unlocked) return;
-      const n = el("div", "nt", `<span class="ai">${ic}</span><div class="tx"><div class="h">${app}<span>${when}</span></div><b>${title}</b><p>${body}</p></div>`);
+      const n = el("div", "nt", `<span class="ai">${ic}</span><div class="tx"><div class="h">${app} • ${when}</div><b>${title}</b><p>${body}</p></div>`);
       n.style.setProperty("--c", c);
       box.appendChild(n);
       sfx.ding();
+      await wait(1100);
     }
+    if (unlocked) return;
+    lockReady = true;
+    $("#lkFp").classList.add("on"); $("#lkHint").classList.add("on");
+    buzz(30);
+    refreshCue();
   }
   lock.addEventListener("pointerdown", (e) => {
     if (e.target.closest("[data-music]")) return;
@@ -1496,14 +1616,15 @@
   lock.addEventListener("pointerup", (e) => {
     if (!lockArmed) return;
     lockArmed = false;
-    const dx = e.clientX - px, dy = e.clientY - py;
-    if (dy < -40 || (Math.abs(dx) < 12 && Math.abs(dy) < 12)) unlock();
+    const dx = e.clientX - px, dy = e.clientY - py, tap = Math.abs(dx) < 12 && Math.abs(dy) < 12;
+    if (dy < -40 || (tap && (lockReady || e.target.closest(".fp, .nt")))) unlock();
   });
   lock.addEventListener("pointercancel", () => (lockArmed = false));
+  $("#lkFp").addEventListener("click", () => unlock());
   function unlock(){
     if (unlocked) return;
     unlocked = true;
-    sfx.unlock();
+    sfx.unlock(); buzz(25);
     lock.classList.add("up");
     toHome(true);
   }
@@ -1520,7 +1641,7 @@
     settings: "Everything's set. Don't touch anything ⚙️",
     calc: "Calculator is off duty. You've done enough maths for one lifetime 🧮",
     phone: "Someone's waiting for the right moment to call… 📞",
-    safari: "No googling “how long do burns take to heal”. Doctor's orders 🩺",
+    chrome: "No googling “how long do burns take to heal”. Doctor's orders 🩺",
   };
   const done = new Set();
   const nextApp = () => ORDER.find((a) => !done.has(a));
@@ -1531,15 +1652,16 @@
       ic.classList.toggle("next", ic.dataset.app === n);
       ic.classList.toggle("done", done.has(ic.dataset.app));
     });
-    $("#hint").innerHTML = n ? `Next up: <b>${NAMES[n]}</b> 👆`
-      : focusOn ? "Rest Focus is on 🌙" : "One last thing: turn on <b>Rest Focus</b> 🌙";
+    const dots = `<span class="pd">${ORDER.map((a) => `<i class="${done.has(a) ? "d" : a === n ? "c" : ""}"></i>`).join("")}</span>`;
+    $("#hint").innerHTML = n ? `${dots}<span>${ORDER.indexOf(n) + 1} of 6 · <b>${NAMES[n]}</b></span>`
+      : `${dots}<span>${focusOn ? "Rest Focus is on 🌙" : "Last step: <b>Rest Focus</b> 🌙"}</span>`;
   }
-  function toHome(first){
-    show("s-home"); sb.classList.remove("lock"); sbMode(false);
+  function toHome(){
+    sb.classList.remove("lock"); sbMode(false);
     const h = $("#s-home");
     h.classList.remove("enter"); void h.offsetWidth; h.classList.add("enter");
     updateNext();
-    if (first) setTimeout(() => toast("Tap the bouncing app to start 👆"), 1000);
+    show("s-home");
   }
   function markDone(a){
     if (done.has(a)) return;
@@ -1547,6 +1669,7 @@
     const bar = $(`#a-${a} .donebar`);
     if (bar) bar.classList.add("on");
     setTimeout(() => sfx.chime(), 150);
+    refreshCue();
   }
   function launch(a, ic){
     const app = $(`#a-${a}`), r = ic.querySelector(".ico").getBoundingClientRect(), pr = phone.getBoundingClientRect();
@@ -1557,6 +1680,7 @@
     sbMode(app.dataset.sb === "dark");
     sfx.open();
     APPS[a]();
+    refreshCue();
   }
   function closeApp(){
     if (!openApp) return;
@@ -1565,6 +1689,7 @@
     sbMode(false);
     sfx.close();
     updateNext();
+    refreshCue();
     if (!nextApp() && !focusOn) setTimeout(() => { if (!openApp && !focusOn) openCC(); }, 1100);
   }
   function switchTo(a){
@@ -1599,12 +1724,12 @@
 
   /* ============================================================ app: Team Body */
   const MEM = {
-    hand: ["Hand", "🤚", "#ff9f0a"], fingers: ["Fingers", "🤞", "#e6a800"], palm: ["Palm", "🫴", "#ff6b9a"], knee: ["Knee", "🦵", "#30b0c7"],
-    legs: ["Legs", "🏃‍♀️", "#28b463"], brain: ["Brain", "🧠", "#bf5af2"], heart: ["Heart", "❤️", "#ff453a"], tummy: ["Tummy", "🍫", "#a0683c"],
-    buddy: ["Running Buddy", "🏃‍♂️", "#0a84ff"],
+    hand: ["Hand", "🤚", "#e07800"], fingers: ["Fingers", "🤞", "#b88a00"], palm: ["Palm", "✋", "#e0407a"], knee: ["Knee", "🦵", "#1b93ad"],
+    legs: ["Legs", "🏃‍♀️", "#1d9650"], brain: ["Brain", "🧠", "#a33fdb"], heart: ["Heart", "❤️", "#e0302a"], tummy: ["Tummy", "🍫", "#8a5530"],
+    buddy: ["Running Buddy", "🏃‍♂️", "#0a74e8"],
   };
   const SCRIPT = [
-    ["day", "Friday 11:52 PM"],
+    ["day", "Friday", "23:52"],
     ["hand", "ok so. small update."],
     ["hand", { v: "friday" }],
     ["hand", "I got burnt 🙂"],
@@ -1613,14 +1738,17 @@
     ["palm", "I didn't get burnt. I just swelled up out of solidarity 🎈"],
     ["brain", "noted. also reminder: new project, new role, VERY full plate 📋"],
     ["heart", "guys. it's late. be nice to her tonight"],
-    ["day", "Saturday 6:40 AM"],
+    ["me", "I'm fine, guys"],
+    ["knee", "you're fine?? I'm a KNEE"],
+    ["heart", "you're allowed to not be fine, you know"],
+    ["day", "Saturday", "6:40"],
     ["legs", "GOOD MORNING TEAM ☀️ we're running 4K"],
     ["hand", "we're WHAT"],
     ["legs", "4K. light jog. you just ride along"],
     ["knee", "I'd like to speak to the manager"],
     ["brain", "the manager is busy. new role, remember?"],
     ["knee", "…unbelievable"],
-    ["day", "Sunday 6:15 AM"],
+    ["day", "Sunday", "6:15"],
     ["legs", "ok today is the 10K 💪"],
     ["palm", "I am literally puffy"],
     ["legs", "puffy AND aerodynamic. love that for us"],
@@ -1635,44 +1763,72 @@
     ["knee", "so you're ALSO responsible"],
     ["buddy", "in my defence, nobody can stop her"],
     ["knee", "clearly 🙄"],
-    ["day", "Today"],
+    ["day", "Today", ""],
     ["tummy", "sorry to interrupt, but has anyone said the word Pepero today", "🍫 4"],
+    ["me", "PEPERO 🍫"],
+    ["tummy", "finally. leadership."],
+    ["brain", "motion passed unanimously"],
+    ["heart", "💛"],
   ];
-  const REPLIES = [
-    ["PEPERO 🍫", [["tummy", "finally. leadership."], ["brain", "motion passed unanimously"], ["heart", "🫶"]]],
-    ["I'm fine, guys", [["knee", "you're fine?? I'm a KNEE"], ["heart", "you're allowed to not be fine, you know"], ["tummy", "Pepero would help. just saying"]]],
-    ["Everyone go to sleep", [["brain", "can't. new role."], ["legs", "can't. thinking about the next run"], ["heart", "she's right though. everyone rest. especially her 🫶"]]],
-  ];
-  const chat = $("#chat"), qr = $("#qr");
+  const chat = $("#chat"), newM = $("#newM"), msgSub = $("#msgSub");
+  const inp = $("#a-msg .inp"), draftTx = $("#draftTx"), sendB = $("#send");
   const chatWait = makePauser(chat);
   const msgGate = () => until(() => openApp === "msg" && !videoOpen);
-  const scrollChat = () => chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
+  const typeMs = (s) => Math.max(550, Math.min(1200, 350 + s.length * 12));
+  const readMs = (s) => Math.max(900, Math.min(2400, 500 + s.length * 30));
+  let members = "Hand, Fingers, Palm, Knee, Legs, Brain, Heart, Tummy";
+  let follow = true, progScroll = 0, chatVid = null, tMin = 0, today = false;
+  function scrollChat(){ progScroll = performance.now() + 900; chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" }); }
+  chat.addEventListener("scroll", () => {
+    if (performance.now() < progScroll) return;
+    follow = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 120;
+    if (follow) newM.classList.add("hide");
+  }, { passive: true });
+  newM.addEventListener("click", () => { follow = true; newM.classList.add("hide"); scrollChat(); });
+  function keepDown(){ if (follow) scrollChat(); else newM.classList.remove("hide"); }
+  function addToChat(node){ chat.appendChild(node); keepDown(); }
+  const fmtT = (m) => { m = ((m % 1440) + 1440) % 1440; const h = Math.floor(m / 60); return `${h % 12 || 12}:${String(m % 60).padStart(2, "0")} ${h < 12 ? "am" : "pm"}`; };
+  const nowMin = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
+  function dayStart(t){
+    today = !t;
+    if (t){ const [h, m] = t.split(":").map(Number); tMin = h * 60 + m; } else tMin = nowMin() - 2;
+  }
+  function stamp(){
+    const m = Math.floor(tMin);
+    tMin += .5;
+    return fmtT(today ? Math.min(m, nowMin()) : m);
+  }
+  function typing(who){
+    msgSub.textContent = who ? `${MEM[who][0]} is typing…` : members;
+    msgSub.classList.toggle("typing", !!who);
+  }
   let EMOJI_ONLY = null;
   try { EMOJI_ONLY = new RegExp("^(\\p{Extended_Pictographic}|\\u200d|\\ufe0f)+$", "u"); } catch (e) {}
   function makeRow(who){
     const [nm, em, c] = MEM[who];
     const last = chat.lastElementChild, cont = !!last && last.dataset.who === who;
     const row = el("div", "row in" + (cont ? " cont" : ""),
-      `<span class="av">${em}</span><div class="col">${cont ? "" : `<span class="nm">${nm}</span>`}<div class="bub dots"><i></i><i></i><i></i></div></div>`);
+      `<span class="av">${em}</span><div class="col"><div class="bub dots">${cont ? "" : `<span class="nm">${nm}</span>`}<span class="dd"><i></i><i></i><i></i></span></div></div>`);
     row.dataset.who = who;
     row.style.setProperty("--c", c);
-    chat.appendChild(row);
-    scrollChat();
+    addToChat(row);
     return row;
   }
   function fill(row, content){
-    const b = row.querySelector(".bub");
+    const b = row.querySelector(".bub"), nm = b.querySelector(".nm"), name = nm ? nm.outerHTML : "";
     if (content.v){
-      b.className = "bub vid"; b.dataset.v = content.v;
-      b.innerHTML = `<img src="media/${content.v}.jpg" alt=""><span class="pl">▶</span><span class="du">${VDUR[content.v]}</span>`;
-      b.querySelector("img").onload = scrollChat;
+      b.className = "bub vid";
+      b.innerHTML = `${name}<button class="vth" data-v="${content.v}" aria-label="Play the video"><img src="media/${content.v}.jpg" alt=""><span class="pl">▶</span>` +
+        `<span class="vt">▶ Tap to play · ${VDUR[content.v]}</span></button><span class="tm">${stamp()}</span>`;
+      b.querySelector("img").onload = keepDown;
     } else {
-      b.className = "bub" + (EMOJI_ONLY && EMOJI_ONLY.test(content) ? " emo" : "");
-      b.textContent = content;
+      const emo = !!(EMOJI_ONLY && EMOJI_ONLY.test(content));
+      b.className = "bub" + (emo ? " emo" : "");
+      b.innerHTML = `${name}<span class="tx"></span>${emo ? "" : `<span class="tm">${stamp()}</span>`}`;
+      b.querySelector(".tx").textContent = content;
     }
-    b.style.animation = "none"; void b.offsetWidth; b.style.animation = "";
     row.style.animation = "none"; void row.offsetWidth; row.style.animation = "";
-    scrollChat();
+    keepDown();
   }
   let chatStarted = false;
   function openMsg(){
@@ -1680,61 +1836,82 @@
     chatStarted = true;
     const ff = $("#msgFF");
     setTimeout(() => ff.classList.remove("off"), 1200);
-    setTimeout(() => ff.classList.add("off"), 6500);
+    setTimeout(() => ff.classList.add("off"), 7500);
+    setCb();
     runChat();
   }
   async function runChat(){
-    await wait(500);
-    for (const [who, content, rx] of SCRIPT){
+    await wait(700);
+    for (const [who, content, x] of SCRIPT){
       await msgGate();
-      if (who === "day"){ chat.appendChild(el("div", "day", content)); scrollChat(); await chatWait(450); continue; }
+      if (who === "day"){ dayStart(x); addToChat(el("div", "day", content)); await chatWait(700); continue; }
       if (who === "sys"){
-        chat.appendChild(el("div", "sys", content)); scrollChat(); sfx.tick();
-        $("#msgSub").textContent = "9 members";
-        await chatWait(1100); continue;
+        addToChat(el("div", "sys", content)); sfx.tick();
+        members += ", Running Buddy"; typing(null);
+        await chatWait(1500); continue;
       }
+      if (who === "me"){ await sendGate(content); await chatWait(700); continue; }
+      typing(who);
       const row = makeRow(who);
-      await chatWait(content.v ? 1000 : Math.min(1700, 550 + content.length * 26));
+      await chatWait(content.v ? 800 : typeMs(content));
       await msgGate();
-      fill(row, content);
-      sfx.pop();
-      if (rx) setTimeout(() => { row.querySelector(".bub").appendChild(el("span", "rx", rx)); sfx.tick(); }, 800);
-      await chatWait(content.v ? 1800 : 380);
-    }
-    showReplies();
-  }
-  function showReplies(){
-    qr.innerHTML = "";
-    REPLIES.forEach((r) => {
-      if (r.used) return;
-      const b = el("button", null, r[0]);
-      b.addEventListener("click", () => reply(r));
-      qr.appendChild(b);
-    });
-    qr.classList.toggle("on", qr.children.length > 0);
-    $("#a-msg").style.setProperty("--cb", $("#a-msg .compose").offsetHeight + "px");
-    setTimeout(scrollChat, 60);
-  }
-  async function reply(r){
-    if (r.used) return;
-    r.used = true;
-    qr.classList.remove("on");
-    $("#a-msg").style.setProperty("--cb", $("#a-msg .compose").offsetHeight + "px");
-    const row = el("div", "row out", `<div class="bub">${r[0]}</div>`);
-    row.dataset.who = "me";
-    chat.appendChild(row); scrollChat(); sfx.send();
-    await chatWait(700);
-    for (const [who, text] of r[1]){
-      await msgGate();
-      const rw = makeRow(who);
-      await chatWait(Math.min(1400, 500 + text.length * 22));
-      fill(rw, text); sfx.pop();
-      await chatWait(380);
+      fill(row, content); typing(null); sfx.pop();
+      if (x) setTimeout(() => { row.classList.add("hasrx"); row.querySelector(".bub").appendChild(el("span", "rx", x)); sfx.tick(); keepDown(); }, 700);
+      if (content.v) await watchGate(row, content.v);
+      else await chatWait(readMs(content) + (x ? 600 : 0));
     }
     markDone("msg");
     $("#a-msg").classList.add("fin");
-    showReplies();
+    follow = true;
+    setTimeout(scrollChat, 60);
   }
+  async function watchGate(row, name){
+    chatVid = row.querySelector(".vth");
+    buzz([15, 60, 15]);
+    refreshCue();
+    await until(() => watched.has(name) && !videoOpen && openApp === "msg");
+    chatVid = null;
+    refreshCue();
+    await chatWait(900);
+  }
+  /* her replies arrive pre-typed: one tap on send, nothing to choose */
+  let draft = "", sent = null;
+  async function sendGate(text){
+    inp.classList.add("draft");
+    draftTx.textContent = "";
+    for (const ch of text){ draftTx.textContent += ch; sfx.key(); await wait(45); }
+    draft = text;
+    inp.classList.add("ready");
+    buzz(12);
+    refreshCue();
+    await new Promise((res) => (sent = res));
+  }
+  function doSend(){
+    if (!draft) return toast("No typing today. Your hand is on leave ✋");
+    const text = draft, res = sent;
+    draft = ""; sent = null;
+    inp.classList.remove("ready", "draft");
+    draftTx.textContent = "Message";
+    sfx.send(); buzz(12);
+    if (today) tMin = Math.max(tMin, nowMin());
+    const row = el("div", "row out", `<div class="bub"><span class="tx"></span><span class="tm">${stamp()} <i class="tk">✓✓</i></span></div>`);
+    row.querySelector(".tx").textContent = text;
+    row.dataset.who = "me";
+    follow = true; addToChat(row);
+    setTimeout(() => $(".tk", row).classList.add("rd"), 900);
+    refreshCue();
+    res();
+  }
+  sendB.addEventListener("click", doSend);
+  $("#draft").addEventListener("click", doSend);
+  chat.addEventListener("click", (e) => {
+    if (draft) return toast("Tap the green ➤ to send it");
+    if (!chatVid || e.target.closest(".vth")) return;
+    const b = chatVid.closest(".bub");
+    b.classList.remove("nudge"); void b.offsetWidth; b.classList.add("nudge");
+    toast("Tap the video first ▶ It's only 10 seconds");
+  });
+  const setCb = () => $("#a-msg").style.setProperty("--cb", $("#a-msg .compose").offsetHeight + "px");
 
   /* ============================================================ app: Health */
   let healthInit = false;
@@ -1759,24 +1936,24 @@
       if (ents[0].isIntersecting){ io2.disconnect(); markDone("health"); }
     }, { root: bd, threshold: .6 });
     io2.observe($("#hCta"));
-    bd.addEventListener("scroll", () => { if (bd.scrollTop > 40) $("#hMore").classList.add("off"); }, { passive: true });
   }
   $("#hCta").addEventListener("click", () => { markDone("health"); switchTo("pep"); });
 
   /* ============================================================ app: Pepero Express */
-  let pepStarted = false;
+  let pepStarted = false, pepArrived = false;
   function openPep(){}
   $("#pepOrder").addEventListener("click", startDelivery);
   async function startDelivery(){
     if (pepStarted) return;
     pepStarted = true;
-    sfx.success();
+    refreshCue();
+    sfx.success(); buzz(15);
     $("#pepCart").classList.add("hide"); $("#pepTrack").classList.remove("hide");
     $("#pepBd").scrollTop = 0;
     const tl = $$("#pepTl li"), st = $("#pepStatus");
     const say = (t) => { st.textContent = t; st.classList.remove("swap"); void st.offsetWidth; st.classList.add("swap"); };
     tl[0].classList.add("ok"); tl[1].classList.add("now");
-    say("Order confirmed! Packing with care… 📦");
+    say("Order confirmed! Sit back and watch 🍿");
     await wait(1500);
     tl[1].classList.replace("now", "ok"); tl[2].classList.add("now");
     say("Running Buddy is jogging. Obviously.");
@@ -1810,12 +1987,15 @@
     $("#pepTrack").classList.add("hide");
     $("#pepDone").classList.remove("hide"); $("#pepDone").classList.add("fadein");
     $("#pepBd").scrollTop = 0;
+    pepArrived = true;
+    refreshCue();
   }
   $("#pepBox").addEventListener("click", () => {
     const box = $("#pepBox");
     if (box.classList.contains("open")) return;
     box.classList.add("open");
-    $("#pepTap").classList.add("hide");
+    buzz([25, 40, 25]);
+    refreshCue();
     sfx.pop(); sfx.tada(); setTimeout(sfx.crunch, 350);
     burstSticks(box, 26);
     chargeBattery();
@@ -1867,11 +2047,12 @@
       } else $$(".bdg", e.target).forEach((b, i) => setTimeout(() => { b.classList.add("in"); sfx.chime(i); }, 200 + i * 280));
     }), { root: bd, threshold: .45 });
     io.observe($("#stRoute")); io.observe($("#stBadges"));
-    bd.addEventListener("scroll", () => { if (bd.scrollTop > 40) $("#stMore").classList.add("off"); }, { passive: true });
   }
+  let kudosGiven = false;
   $("#stKudos").addEventListener("click", (e) => {
     const b = e.currentTarget;
     if (b.classList.contains("used")){ floatUp(b, "👍", 5); sfx.pop(); return; }
+    kudosGiven = true; buzz(20);
     b.classList.add("used"); b.textContent = "Kudos given ✓";
     floatUp(b, "👍", 16); sfx.success();
     $("#stMsg").classList.add("on");
@@ -1895,22 +2076,27 @@
 
   /* ============================================================ app: SplitLoad */
   const SPLIT = [
-    { e: "😮‍💨", t: "Rants about work", r: "Send them over. I'll nod at all the right parts." },
+    { e: "😤", t: "Rants about work", r: "Send them over. I'll nod at all the right parts." },
     { e: "🌀", t: "Overthinking", r: "Mine now. I'll overthink it on your behalf." },
     { e: "🍫", t: "Pepero", no: "Pepero can't be split. Not sharing. Completely understandable." },
     { e: "🌙", t: "Late-night worrying", r: "Night shift is mine." },
     { e: "🛍️", t: "Carrying stuff", r: "Your hand is on leave. Bags are mine." },
     { e: "✨", t: "Your brilliance", no: "Your brilliance is non-transferable, sorry." },
-    { e: "🫙", t: "Opening jars", r: "Finally, a job I'm qualified for." },
+    { e: "🍯", t: "Opening jars", r: "Finally, a job I'm qualified for." },
     { e: "🩹", t: "Healing the hand", swap: "He can't heal it. But he can bring Pepero until it does." },
-    { e: "😵‍💫", t: "Meeting fatigue", r: "I'll be tired for you." },
+    { e: "🥱", t: "Meeting fatigue", r: "I'll be tired for you." },
     { e: "💼", t: "The new role", no: "That one's yours. You earned it. He'll just be the cheerleader." },
     { e: "📅", t: "Mondays", r: "I'll take Mondays. You take the rest of the week off. Kidding. Mostly." },
     { e: "💪", t: "Being strong all the time", r: "You can put this one down for a bit. I've got it." },
   ];
   const TO_MOVE = SPLIT.filter((d) => !d.no).length;
-  let splitInit = false, moved = 0;
+  let splitInit = false, moved = 0, slTouched = false, slIdle = false, slIdleT = 0;
   const mine = $("#myChips"), his = $("#hisChips");
+  function slKick(){
+    clearTimeout(slIdleT); slIdle = false;
+    if (moved < TO_MOVE) slIdleT = setTimeout(() => { slIdle = true; refreshCue(); }, 6000);
+    refreshCue();
+  }
   function slSay(av, text){
     const r = $("#slReply");
     r.innerHTML = `<span class="av">${av}</span><span>${text}</span>`;
@@ -1947,8 +2133,9 @@
     const c = e.target.closest(".chip");
     if (!c) return;
     const d = SPLIT[c.dataset.i];
-    if (c.classList.contains("kept")){ shake(c); sfx.bonk(); return; }
-    if (d.no){ shake(c); sfx.bonk(); c.classList.add("kept"); slSay("⚖️", d.no); return; }
+    slTouched = true; buzz(12);
+    if (c.classList.contains("kept")){ shake(c); sfx.bonk(); slKick(); return; }
+    if (d.no){ shake(c); sfx.bonk(); c.classList.add("kept"); slSay("⚖️", d.no); slKick(); return; }
     if (d.swap){
       sfx.swish();
       flip(() => {
@@ -1967,6 +2154,7 @@
       const over = hp.getBoundingClientRect().top + 90 - bd.getBoundingClientRect().bottom;
       if (over > 0) bd.scrollBy({ top: over, behavior: "smooth" });
     }
+    slKick();
     if (moved === TO_MOVE) setTimeout(settle, 1000);
   });
   function settle(){
@@ -1999,7 +2187,7 @@
       if (r.bottom > br.bottom - 110) ntBd.scrollBy({ top: r.bottom - br.bottom + 150, behavior: "smooth" });
       const kill = !!$(".kill", b);
       if (kill) sfx.chime(1);
-      await ntWait(kill ? 2400 : Math.min(5200, 1000 + b.textContent.trim().length * 30));
+      await ntWait(kill ? 2400 : Math.min(6000, 1000 + b.textContent.trim().length * 34));
     }
     await wait(700);
     markDone("notes");
@@ -2007,27 +2195,31 @@
 
   const APPS = { msg: openMsg, health: openHealth, pep: openPep, stride: openStride, split: openSplit, notes: openNotes };
 
-  /* ============================================================ Control Center → Rest Focus */
+  /* ============================================================ Quick Settings → Rest Focus */
   const cc = $("#cc"), ccWait = makePauser(cc);
   function openCC(){
     if (cc.classList.contains("on")) return;
-    cc.classList.add("on"); sbMode(false); sfx.open();
+    cc.classList.add("on"); sbMode(false); sfx.open(); buzz(10);
+    refreshCue();
   }
-  cc.addEventListener("click", (e) => {
-    if (focusOn || e.target.closest(".cc-grid")) return;
+  function closeCC(){
+    if (!cc.classList.contains("on")) return;
     cc.classList.remove("on"); sfx.close();
-  });
+    refreshCue();
+  }
+  cc.addEventListener("click", (e) => { if (!focusOn && e.target === cc) closeCC(); });
   $("#focusTile").addEventListener("click", async () => {
     if (focusOn) return;
-    focusOn = true;
+    focusOn = true; buzz([20, 50, 20]);
     phone.classList.add("focus");
     $("#focusTile").classList.add("on"); $("#focusSt").textContent = "On";
     $("#ccHint").style.visibility = "hidden";
     $("#ccNote").classList.add("on");
     updateNext();
+    refreshCue();
     sfx.focus();
-    await ccWait(5200);
-    cc.classList.remove("on");
+    await ccWait(7000);
+    closeCC();
     await wait(700);
     toast("🌙 Rest Focus on · 1,068 notifications silenced", 2600);
     await wait(2600);
@@ -2050,7 +2242,8 @@
     show("s-call"); sbMode(false);
     call.classList.add("ringing");
     sfx.ring(true);
-    try { if (navigator.vibrate) navigator.vibrate([500, 300, 500, 300, 500]); } catch (e) {}
+    buzz([500, 300, 500, 300, 500]);
+    refreshCue();
   }
   function stopRing(){
     sfx.ring(false);
@@ -2067,12 +2260,14 @@
     const lbl = $("#clLbl");
     lbl.textContent = "0:00";
     callTimer = setInterval(() => { s++; lbl.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }, 1000);
+    refreshCue();
     runCaptions(false);
   });
   $("#bDecline").addEventListener("click", async () => {
     if (callMode) return;
     callMode = "voice";
     stopRing(); sfx.hang();
+    refreshCue();
     call.classList.add("declined");
     $("#clLbl").textContent = "call declined";
     cap.className = "cap-box dim in";
@@ -2087,22 +2282,27 @@
   });
   async function runCaptions(voice){
     $("#capTap").classList.remove("hide");
+    const dots = $("#capDots");
+    dots.innerHTML = LINES.map(() => "<i></i>").join("");
     let tok = 0;
     for (let i = 0; i < LINES.length; i++){
       cap.className = "cap-box";
       await wait(320);
       cap.textContent = LINES[i];
       cap.classList.add("in");
+      [...dots.children].forEach((d, j) => d.classList.toggle("on", j <= i));
       const me = ++tok, sec = sfx.voice(LINES[i]);
       wave.classList.add("talk");
       setTimeout(() => { if (me === tok) wave.classList.remove("talk"); }, Math.max(1200, sec * 1000));
       if (voice) $("#vnBar").style.width = ((i + 1) / LINES.length) * 100 + "%";
-      await capWait(1600 + LINES[i].length * 58);
+      await capWait(Math.max(sec * 1000 + 600, 1500 + LINES[i].length * 45));
       sfx.hush(); wave.classList.remove("talk");
     }
+    if (voice){ clearInterval(callTimer); $(".vn span").textContent = "▶"; }
     $("#capTap").classList.add("hide");
-    $("#hangLbl").textContent = voice ? "Done" : "End";
+    $("#hangLbl").textContent = voice ? "Done" : "End call";
     call.classList.add("canend");
+    refreshCue();
   }
   $("#bHang").addEventListener("click", () => {
     sfx.hang();
@@ -2112,11 +2312,13 @@
   });
 
   /* ============================================================ installed */
+  let endReady = false;
   function toEnd(){
     show("s-end"); sbMode(true);
     syncMusic();
     setTimeout(sfx.success, 500);
     setTimeout(() => burstSticks($(".chk"), 18), 650);
+    setTimeout(() => { endReady = true; refreshCue(); }, 3200);
   }
   $("#endShare").addEventListener("click", async () => {
     const text = "🍫 JessOS 26.11 installed. Pepero at 100%. Plate: split.";
@@ -2126,6 +2328,181 @@
     location.href = `https://wa.me/?text=${encodeURIComponent(text)}`;
   });
   $("#endAgain").addEventListener("click", () => location.reload());
+
+  /* ============================================================ tap coach: one clear "tap here" at a time */
+  const coach = $("#coach"), cLbl = $("#coachLbl"), cHand = $("#coachHand"), cRing = $("#coachRing");
+  const HAND = 38, HANDS = { below: "👆", center: "👆", above: "👇", right: "👈", left: "👉" }, radii = new WeakMap();
+  let cueT = null, cueText = "", cueOpt = {}, cueAt = 0, cueRaf = 0, cueMode = "", cueKey = "", ringKey = "", lblW = 0, lblH = 0;
+  function cue(t, text, opt = {}){
+    if (!t) return uncue();
+    if (t !== cueT) cueAt = performance.now() + (opt.delay || 0);
+    cueT = t; cueText = text; cueOpt = opt;
+    coach.style.pointerEvents = opt.tap === null ? "none" : "";
+    if (!cueRaf) cueRaf = requestAnimationFrame(coachLoop);
+  }
+  function coachHide(){ coach.classList.remove("on"); cRing.classList.remove("on"); cueMode = ""; }
+  function uncue(){
+    cueT = null;
+    coachHide();
+    cancelAnimationFrame(cueRaf); cueRaf = 0;
+  }
+  function coachLayer(){
+    if (videoOpen) return player;
+    if (cc.classList.contains("on")) return cc;
+    const s = $(".screen.on");
+    return s && s.id === "s-home" && openApp ? $(`#a-${openApp}`) : s;
+  }
+  const scrollerOf = (t) => t.closest(".app-bd, .chat, .up-scroll");
+  function coachLoop(){
+    cueRaf = requestAnimationFrame(coachLoop);
+    const t = cueT, layer = coachLayer();
+    if (!t || performance.now() < cueAt || !layer || !layer.contains(t) || !t.getClientRects().length) return coachHide();
+    const pr = phone.getBoundingClientRect(), r = t.getBoundingClientRect(), sc = scrollerOf(t);
+    let vt = pr.top + 28, vb = pr.bottom - 6;
+    const vl = pr.left, vr = pr.right;
+    if (sc){
+      const s = sc.getBoundingClientRect(), db = sc.parentElement.querySelector(".donebar.on");
+      vt = Math.max(vt, s.top); vb = Math.min(vb, s.bottom);
+      if (db && !db.contains(t)) vb = Math.min(vb, db.getBoundingClientRect().top + 10);
+    }
+    const setText = (s) => { if (cLbl.textContent !== s){ cLbl.textContent = s; lblW = cLbl.offsetWidth; lblH = cLbl.offsetHeight; } };
+    const seen = Math.min(r.bottom, vb) - Math.max(r.top, vt), dir = r.top + r.height / 2 > (vt + vb) / 2 ? "down" : "up";
+    let mode = !sc || seen >= r.height * .8 || (r.height > (vb - vt) * .8 && seen >= 44) ? "tap" : dir;
+    let x, y, place = "";
+    if (mode === "tap"){
+      setText(cueText);
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2, H = HAND + lblH, RW = 36 + lblW;
+      const fits = { below: r.bottom + 2 + H <= vb, above: r.top - 2 - H >= vt, right: r.right + 4 + RW <= vr - 6, left: r.left - 4 - RW >= vl + 6,
+        center: cy >= vt && cy + 20 + H <= vb };
+      place = [cueOpt.place || "below", "below", "above", "right", "center"].find((p) => fits[p]) || (sc ? "" : "center");
+      const side = place === "right" || place === "left";
+      if (!place) mode = dir;
+      else if (place === "below"){ x = cx - lblW / 2; y = r.bottom + 2; }
+      else if (place === "above"){ x = cx - lblW / 2; y = r.top - 2 - H; }
+      else if (place === "right"){ x = r.right + 4; }
+      else if (place === "left"){ x = r.left - 4 - RW; }
+      else { x = cx - lblW / 2; y = cy + 20; }
+      if (side) y = cy - Math.max(HAND, lblH) / 2;
+      x = Math.max(vl + 8, Math.min(vr - 8 - (side ? RW : lblW), x));
+    }
+    if (mode !== "tap"){
+      setText(mode === "down" ? "Scroll down ↓" : "Scroll up ↑");
+      place = mode;
+      x = (vl + vr) / 2 - lblW / 2;
+      y = mode === "down" ? vb - lblH - 16 : vt + 12;
+    }
+    const px = Math.round(x - pr.left), py = Math.round(y - pr.top), key = `${place}|${px}|${py}`;
+    if (key !== cueKey){
+      cueKey = key;
+      coach.style.transform = `translate3d(${px}px,${py}px,0)`;
+      ["above", "right", "left", "down", "up"].forEach((c) => coach.classList.toggle(c, place === c));
+      if (HANDS[place] && cHand.textContent !== HANDS[place]) cHand.textContent = HANDS[place];
+    }
+    cueMode = mode;
+    coach.classList.add("on");
+    const rt = cueOpt.ring || t, rr = rt === t ? r : rt.getBoundingClientRect();
+    if (mode !== "tap" || cueOpt.ring === null || rr.top < vt - 1 || rr.bottom > vb + 1) return cRing.classList.remove("on");
+    if (!radii.has(rt)) radii.set(rt, (parseFloat(getComputedStyle(rt).borderTopLeftRadius) || 0) + 5);
+    const rx = Math.round(rr.left - pr.left) - 5, ry = Math.round(rr.top - pr.top) - 5, rw = Math.round(rr.width) + 10, rh = Math.round(rr.height) + 10;
+    const rk = `${rx}|${ry}|${rw}|${rh}|${radii.get(rt)}`;
+    if (rk !== ringKey){
+      ringKey = rk;
+      Object.assign(cRing.style, { transform: `translate3d(${rx}px,${ry}px,0)`, width: rw + "px", height: rh + "px", borderRadius: radii.get(rt) + "px" });
+    }
+    cRing.classList.add("on");
+  }
+  coach.addEventListener("click", () => {
+    const t = cueT;
+    if (!t) return;
+    if (cueMode === "down" || cueMode === "up"){
+      const sc = scrollerOf(t), s = sc.getBoundingClientRect(), r = t.getBoundingClientRect();
+      sc.scrollBy({ top: r.top + r.height / 2 - (s.top + s.height * .42), behavior: "smooth" });
+      return;
+    }
+    (cueOpt.tap || t).click();
+  });
+
+  function themeNow(){
+    if (videoOpen) return "#000000";
+    if (cc.classList.contains("on")) return "#1a1220";
+    const s = $(".screen.on"), id = s ? s.id : "";
+    if (id === "s-home" && openApp) return $(`#a-${openApp}`).dataset.theme;
+    if (id === "s-home" && focusOn) return "#1b0e22";
+    return THEME[id];
+  }
+  function cueApp(a){
+    const bar = $(`#a-${a} .donebar.on button`), next = (d) => cue(bar, "Tap to continue", { place: "above", delay: d });
+    if (a === "msg"){
+      if (chatVid) return cue(chatVid, "Tap to watch", { place: "center", delay: 700 });
+      if (draft) return cue(sendB, "Tap to send", { place: "left" });
+      return done.has("msg") ? next(1500) : uncue();
+    }
+    if (a === "health") return cue($("#hCta"), "Tap to order a refill", { place: "above", delay: 1800 });
+    if (a === "pep"){
+      if (!pepStarted) return cue($("#pepOrder"), "Tap to order", { place: "above", delay: 1200 });
+      if (!pepArrived) return uncue();
+      if (!$("#pepBox").classList.contains("open")) return cue($("#pepBox"), "Tap the box to open");
+      if (!done.has("pep")) return uncue();
+      return watched.has("pepero") ? next(1200) : cue($("#pepAfter .vcard"), "Tap to watch", { place: "center" });
+    }
+    if (a === "stride"){
+      if (!watched.has("run10k")) return cue($("#stBd .vcard"), "Tap to watch", { place: "center", delay: 1500 });
+      if (!kudosGiven) return cue($("#stKudos"), "Tap to give yourself kudos", { place: "above" });
+      return next(2400);
+    }
+    if (a === "split"){
+      if (!watched.has("monday") && !slTouched) return cue($("#slBd .vrow"), "Watch this first", { delay: 1200 });
+      if (moved < TO_MOVE){
+        if (slTouched && !slIdle) return uncue();
+        const c = $$(".chip", mine).find((c) => !c.classList.contains("kept"));
+        return c ? cue(c, slTouched ? `Keep going · ${TO_MOVE - moved} left` : "Tap to send it his way") : uncue();
+      }
+      return bar ? next(2400) : uncue();
+    }
+    if (a === "notes") return bar ? next(1500) : uncue();
+    uncue();
+  }
+  function refreshCue(){
+    setTheme(themeNow());
+    const s = $(".screen.on"), id = s ? s.id : "";
+    if (videoOpen) return uncue();
+    if (id === "s-update") return cue($("#bInstall"), "Tap to install", { place: "above", delay: 900 });
+    if (id === "s-lock") return lockReady ? cue($("#lkFp"), "Tap to unlock", { place: "above" }) : uncue();
+    if (id === "s-call"){
+      if (call.classList.contains("ringing")) return cue($("#bAccept"), "Tap to answer", { place: "above", ring: $("#bAccept i") });
+      if (call.classList.contains("canend")) return cue($("#bHang"), callMode === "voice" ? "Tap when you're done" : "Tap to end the call", { place: "above", ring: $("#bHang i") });
+      return uncue();
+    }
+    if (id === "s-end") return endReady ? cue($("#endShare"), "Tap to send him a Pepero", { place: "above" }) : uncue();
+    if (cc.classList.contains("on")) return focusOn ? uncue() : cue($("#focusTile"), "Tap Rest Focus", { place: "below", delay: 500 });
+    if (id === "s-home"){
+      if (openApp) return cueApp(openApp);
+      const n = nextApp();
+      if (n){
+        const ic = $(`.ic[data-app="${n}"]`);
+        return cue(ic, done.size ? "Tap to open" : "Start here", { place: "below", ring: $(".ico", ic), delay: 1100 });
+      }
+      if (!focusOn) return cue($("#hint"), "Tap for the last step", { place: "above", delay: 1600 });
+    }
+    uncue();
+  }
+
+  /* ============================================================ Android: back button closes things, long-press does nothing */
+  let guard = 0, leaveT = 0;
+  document.addEventListener("click", () => {
+    if (guard >= 2) return;
+    try { history.pushState({ jessos: guard + 1 }, ""); guard++; } catch (e) {}
+  }, true);
+  addEventListener("popstate", () => {
+    guard = Math.max(0, guard - 1);
+    if (videoOpen) return closeVideo();
+    if (cc.classList.contains("on") && !focusOn) return closeCC();
+    if (openApp) return closeApp();
+    if (performance.now() - leaveT < 2500) return history.go(-(guard + 1));
+    leaveT = performance.now();
+    toast("Press back again to leave JessOS", 2400);
+  });
+  document.addEventListener("contextmenu", (e) => e.preventDefault());
 
   /* ============================================================ test hook: ?at=lock|home|<app>|focus|call|end */
   const AT = (/[?&]at=(\w+)/.exec(Q) || [])[1];
@@ -2143,6 +2520,7 @@
       else if (idx >= 0) setTimeout(() => launch(AT, $(`.ic[data-app="${AT}"]`)), 800);
     }
   }
+  refreshCue();
 })();
 </script>
 </body>
